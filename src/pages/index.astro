@@ -1,13 +1,23 @@
 ---
-
 ---
+
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Astro</title>
+  </head>
+
+  <body>
+    <h1 class="text-7xl">Astro</h1>
+    <style>
+      @tailwind components;
+
+      @layer components {
+        h1 {
+          @apply hover:text-red-50;
+        }
+      }
+    </style>
+  </body>
 </html>
