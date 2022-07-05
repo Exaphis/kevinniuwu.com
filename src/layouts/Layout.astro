@@ -1,0 +1,22 @@
+---
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props as Props;
+---
+
+<!DOCTYPE html>
+<style>
+  @import url("https://rsms.me/inter/inter.css");
+  @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap");
+</style>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<title>{title}</title>
+
+<body class="bg-background text-text py-8 px-8 m-auto max-w-5xl">
+  <slot></slot>
+</body>

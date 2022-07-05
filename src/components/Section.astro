@@ -1,0 +1,19 @@
+---
+export interface Props {
+  pretitle: string;
+  title: string;
+  id: string;
+}
+
+const { pretitle, title, id } = Astro.props;
+---
+
+<div id={id}>
+  <h2 class="font-mono text-4xl">{pretitle}</h2>
+  <div class="mb-5">
+    <h1 class="text-5xl text-accent font-semibold">{title}</h1>
+    <slot name="subtitle"></slot>
+  </div>
+
+  <slot></slot>
+</div>

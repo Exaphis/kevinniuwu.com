@@ -1,23 +1,267 @@
 ---
+import Layout from "../layouts/Layout.astro";
+import Section from "../components/Section.astro";
+import SectionPreview from "../components/SectionPreview.astro";
+import Card from "../components/Card.astro";
+
+// #region images
+import TwoSigmaImg from "../images/two-sigma.svg";
+
+// fallback images (png/jpg)
+import B01lersFallbackImg from "../images/fallback/b01lers.png";
+import CitrixFallbackImg from "../images/fallback/citrix.png";
+import GsocFallbackImg from "../images/fallback/gsoc.png";
+import HackQFallbackImg from "../images/fallback/hackq.png";
+import KevinFallbackImg from "../images/fallback/kevin.jpg";
+import PurdueFallbackImg from "../images/fallback/purdue.png";
+import RssFallbackImg from "../images/fallback/rss.png";
+import SynchronousFallbackImg from "../images/fallback/synchronous.png";
+import TsunamiFallbackImg from "../images/fallback/tsunami.png";
+
+// default images (webp)
+import B01lersImg from "../images/webp/b01lers.webp";
+import CitrixImg from "../images/webp/citrix.webp";
+import GsocImg from "../images/webp/gsoc.webp";
+import HackQImg from "../images/webp/hackq.webp";
+import KevinImg from "../images/webp/kevin.webp";
+import PurdueImg from "../images/webp/purdue.webp";
+import RssImg from "../images/webp/rss.webp";
+import SynchronousImg from "../images/webp/synchronous.webp";
+import TsunamiImg from "../images/webp/tsunami.webp";
+import CenteredPicture from "../components/CenteredPicture.astro";
+import TechTag from "../components/TechTag.astro";
+// #endregion
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Astro</title>
-  </head>
+<Layout title="Kevin Wu">
+  <div
+    id="header"
+    class="flex flex-initial justify-between items-center flex-wrap"
+  >
+    <div class="basis-112">
+      <h1 class="text-3xl font-semibold">Hi! I'm</h1>
+      <h1 class="text-7xl text-accent font-bold">Kevin Wu.</h1>
+      <h2 class="text-2xl font-semibold">
+        I'm a computer science student at Purdue University.
+      </h2>
+    </div>
+    <div class="grow flex justify-center items-center m-8">
+      <div class="w-64 h-64 rounded-full truncate">
+        <picture>
+          <source srcset={KevinImg} type="image/webp" />
+          <img src={KevinFallbackImg} alt="Kevin Wu" class="w-full h-full" />
+        </picture>
+      </div>
+    </div>
+  </div>
 
-  <body>
-    <h1 class="text-7xl">Astro</h1>
-    <style>
-      @tailwind components;
+  <ul class="text-xl list-horizontal">
+    <li>
+      <a class="link" href="/resume">Resume</a>
+    </li>
+    <li>
+      <a class="link" href="mailto:kevin@kevinniuwu.com">Email</a>
+    </li>
+    <li>
+      <a class="link" href="https://github.com/Exaphis">Github</a>
+    </li>
+    <li>
+      <a class="link" href="https://linkedin.com/in/kevw">LinkedIn</a>
+    </li>
+    <li>
+      <a class="link" href="https://blog.kevinniuwu.com/">Blog</a>
+    </li>
+  </ul>
 
-      @layer components {
-        h1 {
-          @apply hover:text-red-50;
+  <SectionPreview name="School" href="#school">
+    I'm currently a rising senior at Purdue University, double majoring in CS
+    and Math. I compete in capture-the-flag competitions with the b01lers CTF
+    club.
+  </SectionPreview>
+  <SectionPreview name="Experience" href="#experience">
+    I'm interning at Two Sigma for the summer of 2022. Last summer, I was a
+    software engineer intern at Citrix.
+  </SectionPreview>
+  <SectionPreview name="Projects" href="#projects">
+    My most recent project is Synchronous, a website where you can easily create
+    temporary workspaces to collaborate with teammates.
+  </SectionPreview>
+
+  <hr class="my-16 border-none" />
+
+  <Section pretitle="01" title="School." id="school">
+    <p slot="subtitle" class="text-lg">
+      I'm a rising senior at Purdue University, where I'm part of some cool
+      clubs and groups.
+    </p>
+
+    <div class="flex justify-center items-center my-4">
+      <picture>
+        <source srcset={PurdueImg} type="image/webp" />
+        <img src={PurdueFallbackImg} alt="Purdue logo" />
+      </picture>
+      <p class="min-w-fit">
+        Expected: Dec. 2022
+        <br />
+        B.S. in Computer Science
+        <br />
+        B.S. in Mathematics
+        <br />
+        GPA: 4.00
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <Card href="https://b01lers.com">
+        <CenteredPicture
+          webp={B01lersImg}
+          fallback={B01lersFallbackImg}
+          alt="B01lers logo"
+        />
+        <p>
+          I compete in capture-the-flag competitions with b01lers, where we
+          learn how to hack and solve various cybersecurity challenges.
+        </p>
+      </Card>
+      <Card href="https://www.cs.purdue.edu/homes/pfonseca/">
+        <CenteredPicture
+          webp={RssImg}
+          fallback={RssFallbackImg}
+          alt="Reliable and Secure Systems logo"
+        />
+        <p>
+          I work in the Reliable and Secure Systems Lab with Prof. Pedro Fonseca
+          and Sishuai Gong on analyzing concurrency bugs in the Linux kernel.
+        </p>
+      </Card>
+    </div>
+  </Section>
+
+  <hr class="my-16 border-none" />
+
+  <Section pretitle="02" title="Experience." id="experience">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <Card href="https://twosigma.com">
+        <img src={TwoSigmaImg} class="h-36" alt="Two Sigma logo" />
+        <p>
+          I'm currently spending the summer with Two Sigma as an intern on the
+          Foundational Storage team.
+        </p>
+        <p class="text-sm font-semibold mt-auto self-start">May - Aug 2022</p>
+      </Card>
+      <Card href="https://www.citrix.com/">
+        <CenteredPicture
+          webp={CitrixImg}
+          fallback={CitrixFallbackImg}
+          alt="Citrix logo"
+        />
+        <p>
+          While interning at Citrix, I worked on the App Layering team
+          developing their Composite File System driver using C.
+        </p>
+        <p>
+          I also worked on internal tools, such as ScanWritableFiles—a Windows
+          shell extension that shows users which files are only on their
+          writable layer.
+        </p>
+        <p class="text-sm font-semibold mt-auto self-start">May - Aug 2021</p>
+      </Card>
+      <Card
+        href="https://summerofcode.withgoogle.com/archive/2020/projects/5453452689276928/"
+      >
+        <CenteredPicture
+          webp={GsocImg}
+          fallback={GsocFallbackImg}
+          alt="Google Summer of Code logo"
+        />
+        <p>
+          During Google Summer of Code 2020, I developed Crossgrader, a package
+          that lets you switch the architecture of a Debian installation. It is
+          available in the Debian package archive.
+        </p>
+        <p class="text-sm font-semibold mt-auto self-start">May - Aug 2020</p>
+      </Card>
+    </div>
+  </Section>
+
+  <hr class="my-16 border-none" />
+
+  <Section pretitle="03" title="Projects." id="projects">
+    <p slot="subtitle" class="text-lg">
+      I always have something fun in the works. Here are a few of my favorites.
+    </p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <Card>
+        <CenteredPicture
+          webp={SynchronousImg}
+          fallback={SynchronousFallbackImg}
+          alt="Synchronous logo"
+        />
+        <p>
+          Synchronous allows you to create temporary collaborative workspaces,
+          quickly. Whenever you need to work on something with somebody else,
+          pop open Synchronous and collaboratively type, draw, or share files.
+        </p>
+        <div class="mt-auto">
+          <TechTag name="Python" />
+          <TechTag name="Django" />
+          <TechTag name="JavaScript" />
+          <TechTag name="React" />
+        </div>
+      </Card>
+      <Card href="https://github.com/Exaphis/HackQ-Trivia">
+        <CenteredPicture
+          webp={HackQImg}
+          fallback={HackQFallbackImg}
+          alt="HackQ-Trivia logo"
+        />
+        <p>
+          HackQ-Trivia is a Python HQ Trivia bot. It receives HQ Trivia
+          questions through their WebSocket connection and answers the questions
+          automatically using web searches and natural language processing.
+        </p>
+        <div class="mt-auto">
+          <TechTag name="Python" />
+        </div>
+      </Card>
+      <Card href="https://github.com/Exaphis/Tsunami">
+        <CenteredPicture
+          webp={TsunamiImg}
+          fallback={TsunamiFallbackImg}
+          alt="Tsunami logo"
+        />
+        <p>
+          Tsunami is a covert Windows driver that can read from and write to the
+          memory of any process. It was used to create a proof-of-concept
+          Overwatch aimbot and wallhack.
+        </p>
+        <div class="mt-auto">
+          <TechTag name="C" />
+          <TechTag name="C++" />
+          <TechTag name="Windows Driver Kit" />
+        </div>
+      </Card>
+    </div>
+  </Section>
+</Layout>
+
+<style>
+  @tailwind components;
+
+  @layer components {
+    .list-horizontal {
+      li {
+        display: inline-block;
+
+        &:not(:last-child):after {
+          /* why do we need two spaces?? */
+          content: " \00b7  ";
         }
       }
-    </style>
-  </body>
-</html>
+    }
+
+    .link {
+      @apply underline duration-200 hover:text-accent;
+    }
+  }
+</style>

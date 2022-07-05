@@ -1,0 +1,16 @@
+---
+export interface Props {
+  webp: string;
+  fallback: string;
+  alt: string;
+}
+
+const { webp, fallback, alt } = Astro.props;
+---
+
+<div class="flex items-center justify-center h-36">
+  <picture>
+    <source srcset={webp} type="image/webp" />
+    <img src={fallback} alt={alt} />
+  </picture>
+</div>
