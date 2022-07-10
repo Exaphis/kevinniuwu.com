@@ -12,6 +12,26 @@ const { title } = Astro.props as Props;
   @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap");
 </style>
 
+<style is:global>
+  @tailwind components;
+
+  @layer components {
+    .list-horizontal {
+      li {
+        display: inline-block;
+
+        &:not(:last-child):after {
+          content: "·";
+        }
+      }
+    }
+
+    .link {
+      @apply underline duration-200 hover:text-accent;
+    }
+  }
+</style>
+
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width" />
 <link rel="icon" type="image/x-icon" href="/favicon.ico" />

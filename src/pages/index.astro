@@ -244,24 +244,3 @@ import TechTag from "../components/TechTag.astro";
     </div>
   </Section>
 </Layout>
-
-<style>
-  @tailwind components;
-
-  @layer components {
-    .list-horizontal {
-      li {
-        display: inline-block;
-
-        &:not(:last-child):after {
-          /* why do we need two spaces?? */
-          content: " \00b7  ";
-        }
-      }
-    }
-
-    .link {
-      @apply underline duration-200 hover:text-accent;
-    }
-  }
-</style>
