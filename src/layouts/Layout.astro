@@ -1,4 +1,5 @@
 ---
+import Blank from "./Blank.astro";
 export interface Props {
   title: string;
 }
@@ -6,46 +7,25 @@ export interface Props {
 const { title } = Astro.props as Props;
 ---
 
-<!DOCTYPE html>
-<style>
-  @import url("https://rsms.me/inter/inter.css");
-  @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap");
-</style>
+<Blank title={title}>
+  <style is:global slot="header">
+    @tailwind components;
 
-<style is:global>
-  @tailwind components;
+    @layer components {
+      .list-horizontal {
+        li {
+          display: inline-block;
 
-  @layer components {
-    .list-horizontal {
-      li {
-        display: inline-block;
-
-        &:not(:last-child):after {
-          content: "·";
+          &:not(:last-child):after {
+            content: "·";
+          }
         }
       }
+
+      .link {
+        @apply underline duration-200 hover:text-accent;
+      }
     }
-
-    .link {
-      @apply underline duration-200 hover:text-accent;
-    }
-  }
-</style>
-
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width" />
-<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-<script
-  async
-  defer
-  data-domain="kevinniuwu.com"
-  src="https://data.wukevin.net/js/pa.js"
->
-
-</script>
-
-<title>{title}</title>
-
-<body class="bg-background text-text py-8 px-8 m-auto max-w-5xl">
+  </style>
   <slot></slot>
-</body>
+</Blank>
