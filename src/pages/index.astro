@@ -4,7 +4,6 @@ import Layout from "../layouts/Layout.astro";
 import Section from "../components/Section.astro";
 import SectionPreview from "../components/SectionPreview.astro";
 import Card from "../components/Card.astro";
-import CenteredPicture from "../components/CenteredPicture.astro";
 import TechTag from "../components/TechTag.astro";
 
 // #region images
@@ -64,18 +63,20 @@ import TwoSigmaImg from "../images/twosigma.svg";
     </div>
     <div class="grow flex justify-center items-center m-8">
       <div class="w-64 h-64 rounded-full truncate">
+        <!-- Eagerly load largest image in the page -->
         <Picture
           class="w-full h-full"
           src={KevinImg}
           widths={[500]}
           sizes={""}
+          loading="eager"
           alt="Image of Kevin Wu"
         />
       </div>
     </div>
   </div>
 
-  <ul class="text-xl list-horizontal">
+  <ul class="text-2xl list-horizontal">
     <li>
       <a class="link" href="/resume">Resume</a>
     </li>
@@ -83,7 +84,7 @@ import TwoSigmaImg from "../images/twosigma.svg";
       <a class="link" href="mailto:kevin@kevinniuwu.com">Email</a>
     </li>
     <li>
-      <a class="link" href="https://github.com/Exaphis">Github</a>
+      <a class="link" href="https://github.com/Exaphis">GitHub</a>
     </li>
     <li>
       <a class="link" href="https://linkedin.com/in/kevw">LinkedIn</a>
@@ -161,7 +162,7 @@ import TwoSigmaImg from "../images/twosigma.svg";
   <Section pretitle="02" title="Experience." id="experience">
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <Card href="https://twosigma.com">
-        <img src={TwoSigmaImg} class="h-36" alt="Two Sigma logo" />
+        <img src={TwoSigmaImg} class="h-36" width={500} alt="Two Sigma logo" />
         <p>
           I'm currently spending the summer with Two Sigma as an intern on the
           Foundational Storage team.
