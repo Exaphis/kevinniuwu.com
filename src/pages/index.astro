@@ -33,7 +33,31 @@ import TechTag from "../components/TechTag.astro";
 // #endregion
 ---
 
-<Layout title="Kevin Wu">
+<style>
+  @tailwind components;
+
+  @layer components {
+    /* Add dot between elements of list */
+    .list-horizontal {
+      li {
+        display: inline-block;
+
+        &:not(:last-child):after {
+          content: "·";
+        }
+      }
+    }
+
+    /* Add underline style to links */
+    .link {
+      @apply underline duration-200 hover:text-accent;
+    }
+  }
+</style>
+<Layout
+  title="Kevin Wu"
+  bodyClass="bg-background text-text py-8 px-8 m-auto max-w-5xl"
+>
   <div
     id="header"
     class="flex flex-initial justify-between items-center flex-wrap"
@@ -231,8 +255,8 @@ import TechTag from "../components/TechTag.astro";
           alt="Tsunami logo"
         />
         <p>
-          Tsunami is a covert Windows driver that can read from and write to the
-          memory of any process. It was used to create a proof-of-concept
+          <b>Tsunami</b> is a covert Windows driver that can read from and write
+          to the memory of any process. It was used to create a proof-of-concept
           Overwatch aimbot and wallhack.
         </p>
         <div class="mt-auto">
