@@ -8,27 +8,36 @@ const { title, bodyClass } = Astro.props as Props;
 ---
 
 <!DOCTYPE html>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width" />
-<title>{title}</title>
-<style>
-  @import url("https://rsms.me/inter/inter.css");
-  @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap");
-</style>
-<script
-  async
-  defer
-  data-domain="kevinniuwu.com"
-  src="https://data.wukevin.net/js/pa.js"
->
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title}</title>
+    <link
+      rel="shortcut icon"
+      href="/assets/heart-128x128.png"
+      type="image/x-icon"
+    />
+    <style>
+      @import url("https://rsms.me/inter/inter.css");
+      @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap");
+    </style>
+    <script
+      async
+      defer
+      data-domain="kevinniuwu.com"
+      src="https://data.wukevin.net/js/pa.js"
+    >
 
-</script>
-<slot name="header"></slot>
+    </script>
+    <slot name="header"></slot>
+  </head>
 
-<body
-  class={bodyClass !== undefined
-    ? bodyClass
-    : "bg-background text-text py-8 px-8 m-auto max-w-5xl"}
->
-  <slot></slot>
-</body>
+  <body
+    class={bodyClass !== undefined
+      ? bodyClass
+      : "bg-background text-text py-8 px-8 m-auto max-w-5xl"}
+  >
+    <slot></slot>
+  </body>
+</html>
