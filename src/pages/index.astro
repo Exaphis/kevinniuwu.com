@@ -1,35 +1,23 @@
 ---
+import { Picture } from "@astrojs/image/components";
 import Layout from "../layouts/Layout.astro";
 import Section from "../components/Section.astro";
 import SectionPreview from "../components/SectionPreview.astro";
 import Card from "../components/Card.astro";
-
-// #region images
-import TwoSigmaImg from "../images/two-sigma.svg";
-
-// fallback images (png/jpg)
-import B01lersFallbackImg from "../images/fallback/b01lers.png";
-import CitrixFallbackImg from "../images/fallback/citrix.png";
-import GsocFallbackImg from "../images/fallback/gsoc.png";
-import HackQFallbackImg from "../images/fallback/hackq.png";
-import KevinFallbackImg from "../images/fallback/kevin.jpg";
-import PurdueFallbackImg from "../images/fallback/purdue.png";
-import RssFallbackImg from "../images/fallback/rss.png";
-import SynchronousFallbackImg from "../images/fallback/synchronous.png";
-import TsunamiFallbackImg from "../images/fallback/tsunami.png";
-
-// default images (webp)
-import B01lersImg from "../images/webp/b01lers.webp";
-import CitrixImg from "../images/webp/citrix.webp";
-import GsocImg from "../images/webp/gsoc.webp";
-import HackQImg from "../images/webp/hackq.webp";
-import KevinImg from "../images/webp/kevin.webp";
-import PurdueImg from "../images/webp/purdue.webp";
-import RssImg from "../images/webp/rss.webp";
-import SynchronousImg from "../images/webp/synchronous.webp";
-import TsunamiImg from "../images/webp/tsunami.webp";
 import CenteredPicture from "../components/CenteredPicture.astro";
 import TechTag from "../components/TechTag.astro";
+
+// #region images
+import B01lersImg from "../images/b01lers.png";
+import CitrixImg from "../images/citrix.png";
+import GsocImg from "../images/gsoc.png";
+import HackQImg from "../images/hackq.png";
+import KevinImg from "../images/kevin.jpg";
+import PurdueImg from "../images/purdue.png";
+import RssImg from "../images/rss.png";
+import SynchronousImg from "../images/synchronous.png";
+import TsunamiImg from "../images/tsunami.png";
+import TwoSigmaImg from "../images/twosigma.svg";
 // #endregion
 ---
 
@@ -52,6 +40,11 @@ import TechTag from "../components/TechTag.astro";
     .link {
       @apply underline duration-200 hover:text-accent;
     }
+
+    /* For centered picture containers */
+    .picture-centered {
+      @apply flex h-36 items-center justify-center;
+    }
   }
 </style>
 <Layout
@@ -71,10 +64,13 @@ import TechTag from "../components/TechTag.astro";
     </div>
     <div class="grow flex justify-center items-center m-8">
       <div class="w-64 h-64 rounded-full truncate">
-        <picture>
-          <source srcset={KevinImg} type="image/webp" />
-          <img src={KevinFallbackImg} alt="Kevin Wu" class="w-full h-full" />
-        </picture>
+        <Picture
+          class="w-full h-full"
+          src={KevinImg}
+          widths={[500]}
+          sizes={""}
+          alt="Image of Kevin Wu"
+        />
       </div>
     </div>
   </div>
@@ -120,10 +116,7 @@ import TechTag from "../components/TechTag.astro";
     </p>
 
     <div class="flex justify-center items-center my-4">
-      <picture>
-        <source srcset={PurdueImg} type="image/webp" />
-        <img src={PurdueFallbackImg} alt="Purdue logo" />
-      </picture>
+      <Picture src={PurdueImg} widths={[500]} sizes={""} alt="Purdue logo" />
       <p class="min-w-fit">
         Expected: Dec. 2022
         <br />
@@ -137,22 +130,24 @@ import TechTag from "../components/TechTag.astro";
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <Card href="https://b01lers.com">
-        <CenteredPicture
-          webp={B01lersImg}
-          fallback={B01lersFallbackImg}
-          alt="B01lers logo"
-        />
+        <div class="picture-centered">
+          <Picture src={B01lersImg} widths={[500]} sizes={""} alt="B01lers logo"
+          />
+        </div>
         <p>
           I compete in capture-the-flag competitions with b01lers, where we
           learn how to hack and solve various cybersecurity challenges.
         </p>
       </Card>
       <Card href="https://www.cs.purdue.edu/homes/pfonseca/">
-        <CenteredPicture
-          webp={RssImg}
-          fallback={RssFallbackImg}
-          alt="Reliable and Secure Systems logo"
-        />
+        <div class="picture-centered">
+          <Picture
+            src={RssImg}
+            widths={[500]}
+            sizes={""}
+            alt="Reliable and Secure Systems logo"
+          />
+        </div>
         <p>
           I work in the Reliable and Secure Systems Lab with Prof. Pedro Fonseca
           and Sishuai Gong on analyzing concurrency bugs in the Linux kernel.
@@ -174,11 +169,10 @@ import TechTag from "../components/TechTag.astro";
         <p class="text-sm font-semibold mt-auto self-start">May - Aug 2022</p>
       </Card>
       <Card href="https://www.citrix.com/">
-        <CenteredPicture
-          webp={CitrixImg}
-          fallback={CitrixFallbackImg}
-          alt="Citrix logo"
-        />
+        <div class="picture-centered">
+          <Picture src={CitrixImg} widths={[500]} sizes={""} alt="Citrix logo"
+          />
+        </div>
         <p>
           While interning at Citrix, I worked on the App Layering team
           developing their Composite File System driver using C.
@@ -193,11 +187,14 @@ import TechTag from "../components/TechTag.astro";
       <Card
         href="https://summerofcode.withgoogle.com/archive/2020/projects/5453452689276928/"
       >
-        <CenteredPicture
-          webp={GsocImg}
-          fallback={GsocFallbackImg}
-          alt="Google Summer of Code logo"
-        />
+        <div class="picture-centered">
+          <Picture
+            src={GsocImg}
+            widths={[500]}
+            sizes={""}
+            alt="Google Summer of Code logo"
+          />
+        </div>
         <p>
           During Google Summer of Code 2020, I developed Crossgrader, a package
           that lets you switch the architecture of a Debian installation. It is
@@ -216,11 +213,15 @@ import TechTag from "../components/TechTag.astro";
     </p>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <Card>
-        <CenteredPicture
-          webp={SynchronousImg}
-          fallback={SynchronousFallbackImg}
-          alt="Synchronous logo"
-        />
+        <div class="picture-centered">
+          <Picture
+            src={SynchronousImg}
+            widths={[180]}
+            sizes={""}
+            alt="Synchronous logo"
+          />
+        </div>
+
         <p>
           Synchronous allows you to create temporary collaborative workspaces,
           quickly. Whenever you need to work on something with somebody else,
@@ -234,11 +235,14 @@ import TechTag from "../components/TechTag.astro";
         </div>
       </Card>
       <Card href="https://github.com/Exaphis/HackQ-Trivia">
-        <CenteredPicture
-          webp={HackQImg}
-          fallback={HackQFallbackImg}
-          alt="HackQ-Trivia logo"
-        />
+        <div class="picture-centered">
+          <Picture
+            src={HackQImg}
+            widths={[250]}
+            sizes={""}
+            alt="HackQ-Trivia logo"
+          />
+        </div>
         <p>
           HackQ-Trivia is a Python HQ Trivia bot. It receives HQ Trivia
           questions through their WebSocket connection and answers the questions
@@ -249,11 +253,10 @@ import TechTag from "../components/TechTag.astro";
         </div>
       </Card>
       <Card href="https://github.com/Exaphis/Tsunami">
-        <CenteredPicture
-          webp={TsunamiImg}
-          fallback={TsunamiFallbackImg}
-          alt="Tsunami logo"
-        />
+        <div class="picture-centered">
+          <Picture src={TsunamiImg} widths={[250]} sizes={""} alt="Tsunami logo"
+          />
+        </div>
         <p>
           <b>Tsunami</b> is a covert Windows driver that can read from and write
           to the memory of any process. It was used to create a proof-of-concept

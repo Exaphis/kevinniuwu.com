@@ -9,6 +9,7 @@
     "preview": "astro preview"
   },
   "devDependencies": {
+    "@astrojs/image": "^0.3.0",
     "@astrojs/tailwind": "^0.2.2",
     "astro": "^1.0.0-rc.3",
     "prettier": "^2.7.1",
