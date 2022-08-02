@@ -2,12 +2,17 @@
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="Kevin Wu - Page Not Found">
+<Layout
+  title="Kevin Wu - Page Not Found"
+  bodyClass="bg-background text-text py-8 px-8 m-auto max-w-5xl"
+>
   <div
     class="flex flex-col items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
   >
     <h1 class="text-7xl font-bold text-accent">404</h1>
     <p class="text-xl">The page you were looking for doesn't exist.</p>
-    <a class="link" href="/">Back to home</a>
+    <a class="underline duration-200 hover:text-accent" href="/"
+      >Back to home
+    </a>
   </div>
 </Layout>
