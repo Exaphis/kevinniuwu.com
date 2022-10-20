@@ -1,4 +1,5 @@
 ---
+// use picture instead of image for multiple avif/webp/fallback support
 import { Picture } from "@astrojs/image/components";
 import Layout from "../layouts/Layout.astro";
 import Section from "../components/Section.astro";
@@ -117,7 +118,7 @@ import TwoSigmaImg from "../images/twosigma.svg";
     </p>
 
     <div class="flex justify-center items-center my-4">
-      <Picture src={PurdueImg} widths={[500]} sizes={""} alt="Purdue logo" />
+      <Picture src={PurdueImg} widths={[750]} sizes={""} alt="Purdue logo" />
       <p class="min-w-fit">
         Expected: Dec. 2022
         <br />
@@ -218,7 +219,7 @@ import TwoSigmaImg from "../images/twosigma.svg";
           <Picture
             src={SynchronousImg}
             widths={[180]}
-            sizes={""}
+            sizes={"10em"}
             alt="Synchronous logo"
           />
         </div>
@@ -240,7 +241,7 @@ import TwoSigmaImg from "../images/twosigma.svg";
           <Picture
             src={HackQImg}
             widths={[250]}
-            sizes={""}
+            sizes={"15em"}
             alt="HackQ-Trivia logo"
           />
         </div>
@@ -255,7 +256,11 @@ import TwoSigmaImg from "../images/twosigma.svg";
       </Card>
       <Card href="https://github.com/Exaphis/Tsunami">
         <div class="picture-centered">
-          <Picture src={TsunamiImg} widths={[250]} sizes={""} alt="Tsunami logo"
+          <Picture
+            src={TsunamiImg}
+            widths={[250]}
+            sizes={"15em"}
+            alt="Tsunami logo"
           />
         </div>
         <p>
