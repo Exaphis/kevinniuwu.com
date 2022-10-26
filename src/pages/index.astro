@@ -18,6 +18,7 @@ import RssImg from "../images/rss.png";
 import SynchronousImg from "../images/synchronous.png";
 import TsunamiImg from "../images/tsunami.png";
 import TwoSigmaImg from "../images/twosigma.svg";
+import DEShawImg from "../images/deshaw.svg";
 // #endregion
 ---
 
@@ -96,13 +97,12 @@ import TwoSigmaImg from "../images/twosigma.svg";
   </ul>
 
   <SectionPreview name="School" href="#school">
-    I'm currently a rising senior at Purdue University, double majoring in CS
-    and Math. I compete in capture-the-flag competitions with the b01lers CTF
-    club.
+    I'm currently a senior at Purdue University, double majoring in CS and Math.
+    I compete in capture-the-flag competitions with the b01lers CTF club.
   </SectionPreview>
   <SectionPreview name="Experience" href="#experience">
-    I'm interning at Two Sigma for the summer of 2022. Last summer, I was a
-    software engineer intern at Citrix.
+    After graduation, I'll be working at D. E. Shaw as a software engineer. Last
+    summer, I was a software engineer intern at Two Sigma.
   </SectionPreview>
   <SectionPreview name="Projects" href="#projects">
     My most recent project is Synchronous, a website where you can easily create
@@ -113,8 +113,8 @@ import TwoSigmaImg from "../images/twosigma.svg";
 
   <Section pretitle="01" title="School." id="school">
     <p slot="subtitle" class="text-lg">
-      I'm a rising senior at Purdue University, where I'm part of some cool
-      clubs and groups.
+      I'm a senior at Purdue University, where I'm part of some cool clubs and
+      groups.
     </p>
 
     <div class="flex justify-center items-center my-4">
@@ -162,15 +162,27 @@ import TwoSigmaImg from "../images/twosigma.svg";
 
   <Section pretitle="02" title="Experience." id="experience">
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <Card href="https://deshaw.com">
+        <div class="picture-centered">
+          <img src={DEShawImg} class="h-36" width={400} alt="D. E. Shaw logo" />
+        </div>
+        <p>I'm excited to join D. E. Shaw as a software engineer full-time!</p>
+        <p class="text-sm font-semibold mt-auto self-start">Mar 2023</p>
+      </Card>
       <Card href="https://twosigma.com">
         <img src={TwoSigmaImg} class="h-36" width={500} alt="Two Sigma logo" />
         <p>
-          I'm currently spending the summer with Two Sigma as an intern on the
-          Foundational Storage team.
+          At Two Sigma, I worked on the Foundational Storage team, where I
+          extended Two Sigma's internal S3 UI (TS3UI) to Google Cloud Storage
+          buckets.
+        </p>
+        <p>
+          Using my CTF skills, I was also able to find and fix three different
+          cross-site scripting vulnerabilities in various internal services.
         </p>
         <p class="text-sm font-semibold mt-auto self-start">May - Aug 2022</p>
       </Card>
-      <Card href="https://www.citrix.com/">
+      <Card href="https://citrix.com/">
         <div class="picture-centered">
           <Picture src={CitrixImg} widths={[500]} sizes={""} alt="Citrix logo"
           />
