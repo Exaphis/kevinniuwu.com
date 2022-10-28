@@ -8,7 +8,9 @@ module.exports = {
       colors: {
         accent: "#D9A629",
         background: "#08122B",
-        text: "#CCCCCC",
+        link: "#A9E2EE",
+        linkRead: "#A498EC",
+        text: "#EEEEEE",
       },
       spacing: {
         112: "28rem",

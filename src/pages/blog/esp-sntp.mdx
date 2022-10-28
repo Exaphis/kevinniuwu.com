@@ -1,0 +1,56 @@
+---
+title: "The little-known built-in SNTP client of the ESP8266"
+layout: ../../layouts/BlogLayout.astro
+date: "2022-01-16"
+---
+
+While making an [RGB matrix clock using an ESP8266](https://github.com/Exaphis/esp8266-clock),
+I needed to synchronize the time of the clock using NTP in order to get correct time information for a given timezone.
+
+A cursory Google search led me to various NTP client libraries,
+requiring the use of a separate timezone library in order to convert the
+given epoch time into the correct local time. I made do with [NTPClient](https://github.com/arduino-libraries/NTPClient)
+and [Timezone](https://github.com/JChristensen/Timezone),
+which for some reason caused ESP8266 to reboot every so often as well as failures to update the time,
+causing the clock to drift up to a few minutes until the update succeeded.
+
+I was shocked to find that ESP8266's Arduino core contains this function:
+
+`configTime(const char* tz, const char* server1, const char* server2 = nullptr, const char* server3 = nullptr)`[^1]
+
+This allows users to specify an NTP server and a **timezone** (!),
+and automatically sends a request every hour[^2] to synchronize the time.
+Daylight saving time is handled with no extra libraries necessary.
+
+Let's see all the code we need (based on [example ESP8266 Arduino code](https://github.com/esp8266/Arduino/blob/60fe7b4ca8cdca25366af8a7c0a7b70d32c797f8/libraries/ESP8266mDNS/examples/LEAmDNS/mDNS_Clock/mDNS_Clock.ino#L89)):
+
+```cpp
+#include <TZ.h>  // for POSIX timezone formats
+
+void setClock(void) {
+    configTime(TZ_America_Los_Angeles, "pool.ntp.org");
+
+    // if the time must be correct, this section of code
+    // waits until the ntp response is received
+    // could use a settimeofday callback here
+     Serial.print("Waiting for NTP time sync: ");
+    // Secs since 01.01.1970 (when uninitialized starts with (8 * 3600 = 28800)
+    time_t now = time(nullptr);
+    while (now < 8 * 3600 * 2) {  // Wait for realistic value
+        delay(500);
+        Serial.print(".");
+        now = time(nullptr);
+    }
+
+    Serial.println();
+
+    time_t now = time(0);
+    Serial.print("Current time: ");
+    Serial.print(ctime(now));
+}
+```
+
+Note that `configTime` takes in a POSIX timezone format. For more details, check out [this helpful comment](https://github.com/esp8266/Arduino/issues/4637#issuecomment-449696188).
+
+[^1]: [Official ESP8266 Arduino.h](https://github.com/esp8266/Arduino/blob/cf6ff4c4f834f7b288c19b3fadbf5aedc0e8e08f/cores/esp8266/Arduino.h#L272)
+[^2]: [Comment in example NTP ino file](https://github.com/esp8266/Arduino/blob/60fe7b4ca8cdca25366af8a7c0a7b70d32c797f8/libraries/esp8266/examples/NTP-TZ-DST/NTP-TZ-DST.ino#L243)

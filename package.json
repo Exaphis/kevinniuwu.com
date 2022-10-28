@@ -17,6 +17,7 @@
     "prettier-plugin-tailwindcss": "^0.1.11"
   },
   "dependencies": {
+    "@astrojs/mdx": "^0.11.5",
     "sharp": "^0.31.1"
   }
 }

@@ -1,0 +1,107 @@
+---
+title: "Hosting a LaTeX Resume using GitHub"
+layout: ../../layouts/BlogLayout.astro
+date: "2022-05-19"
+---
+
+TL;DR: Use Overleaf to push to GitHub repo, GitHub Actions to compile,
+Embed a link to GitHub Pages wherever you need the PDF.
+
+## Initial setup using Netlify
+
+For a few years, I've been using Overleaf to write my resume.
+My resume is also a file on my website.
+However, when I wanted to update it, my workflow looked like this:
+
+1. Change the tex file
+2. Compile the PDF
+3. Download the PDF
+4. Upload the PDF to the server hosting my website
+
+I often forgot that I needed to update the file on the server, resulting in
+an outdated copy of my resume on my website.
+It's worse if I made a small change and then realized I wanted to change it again!
+
+More recently, I overhauled [my site](https://kevinniuwu.com).
+It's now hosted on Netlify. But now, every time I wanted to update my resume,
+I had to add a new commit just saying "Update resume." How ugly!
+
+So instead, I linked my Overleaf to GitHub and started pushing my changes there.
+Using [GitHub Actions](https://github.com/marketplace/actions/github-action-for-latex),
+you can automatically build your resume and upload the result as a release.
+
+However, that came with a big problem: you could only download the PDF, not view it inline.
+This is due to GitHub sending the `Content-Disposition: attachment` header in the response.
+As far as I know, you shouldn't be able to bypass this for security reasons
+(e.g. uploaded HTML files shown inline could lead to cross-site scripting attacks).
+
+To get around this, I made a simple [Netlify function](https://github.com/Exaphis/kevinniuwu.com-react/blob/505948d51b59f80d444c2224c1c5f39ae616c141/netlify/functions/resume-fetch/resume-fetch.js)
+that fetched the release and re-served it as a base64 blob, but without forcing it to be an attachment.
+This still felt janky - since I'm not downloading the PDF myself, I don't get a nice progress bar.
+
+## Solution using GitHub Actions + Pages
+
+Finally, I had some time to work on this, and I settled with this solution.
+
+Instead of using GitHub Actions to create a release,
+I can use it to push the file to a separate branch of the repository called build.
+Then, I can use GitHub Pages to host the build branch, letting me view the built PDF.
+
+The final GitHub Actions workflow looks like this:
+
+```yml
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and commit the PDF
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Compile resume
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: main.tex
+
+      - name: View logs
+        run: cat main.log
+
+      - name: Move PDF
+        run: |
+          mkdir build
+          mv main.pdf 'build/Kevin Wu Resume.pdf'
+
+      - name: Push build
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: build
+          FOLDER: build
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MESSAGE: "Build: ({sha}) {msg}"
+```
+
+And in the settings of the repository:
+![](https://i.imgur.com/dVNgVAw.png)
+
+The final result can be viewed at [https://github.com/Exaphis/resume](https://github.com/Exaphis/resume).
+
+GitHub Pages hosting my resume: [https://exaphis.github.io/resume/Kevin%20Wu%20Resume.pdf](https://exaphis.github.io/resume/Kevin%20Wu%20Resume.pdf)
+
+## Final notes
+
+In the response headers, GitHub Pages sets the cache control max age to 600 seconds.
+This means that after updating the PDF in the repo, it might take up to 10 minutes
+for users who have previously viewed the PDF to see the new version.
+This was fine for me, so I didn't bother investigating ways to get around this.

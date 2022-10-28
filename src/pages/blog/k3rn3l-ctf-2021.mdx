@@ -1,0 +1,325 @@
+---
+title: "K3RN3LCTF - BogoSolve/BogoAttack Writeup"
+layout: ../../layouts/BlogLayout.astro
+date: "2021-11-16"
+---
+
+Over Nov 12-13, 2021, I played in K3RN3LCTF as part of [b01lers](https://b01lers.com/).
+
+Thanks to drdoctor for the fun challenge and K3RN3LARMY for hosting the CTF!
+
+## Challenge description
+
+I was trying to sort using Bogosort, but it was taking a while, so in the meantime I made this challenge. Enjoy!
+
+`nc ctf.k3rn3l4rmy.com 2237`
+
+Attached: [main.py](https://raw.githubusercontent.com/Kasimir123/K3RN3LCTF-2021/main/server-files/BogoAttack/main.py)
+
+## Goal
+
+The server has a randomly shuffled array of 10,000 numbers taking on eachvalue between 0 and 9,999.
+The goal is to **guess the entire array of numbers**.
+
+You are able to **steal numbers** at any indices of the array.
+If you send a list of indices to the server,
+it will return the list of numbers that are at those indices in the shuffled array.
+
+However, the numbers returned are themselves shuffled - **you don't know which numbers are at which index!**
+
+You can perform at most **14** steals before guessing the array. There's only one chance to guess all of the numbers.
+
+Sample interaction with server:
+
+```
+Enter (1) to steal and (2) to guess: 1
+Enter numbers to steal: 0 1
+Stolen: [5423, 4664]
+Enter (1) to steal and (2) to guess: 1
+Enter numbers to steal: 0 1
+Stolen: [4664, 5423]
+Enter (1) to steal and (2) to guess: 2
+What is the list: 0 1 2 3 4 5
+NOPE
+```
+
+Even though we steal the same two indices both times,
+the numbers returned to us are not in the same order. We can't infer which index contains which number.
+
+## Solution
+
+tl;dr - binary search
+
+The 14 steals we have seems awfully arbitrary, doesn't it?
+
+14 happens to be pretty significant in this context, as log<sub>2</sub>(10000) = 13.2877.
+If you've taking programming classes, the log<sub>2</sub> might seem familiar to you -
+is this some divide and conquer algorithm like binary search?
+
+Let's walk through some simpler examples and see whether or not we can generalize our
+findings to an arbitrarily large array.
+
+### Walkthrough - length 2
+
+Say we have an shuffled array containing two numbers (0 and 1).
+
+How can we guess the order of the array with one steal?
+
+Simple! Just steal the 1st number (or 2nd, doesn't matter).
+Once we know the 1st number, we also know the 2nd one must be the one that the server didn't return.
+
+By stealing half of the indices, we reduced the possible numbers that each index could be by half (2 to 1).
+
+### Walkthrough - length 4
+
+Let's level it up to a shuffled array containing four numbers (for example's sake, let it be `[0, 3, 1, 2]`).
+Can we guess the order with two steals?
+
+Let's lay out what we know in a table.
+
+| Index | Possible numbers |
+| ----- | ---------------- |
+| 0     | 0, 1, 2, 3       |
+| 1     | 0 ,1, 2, 3       |
+| 2     | 0 ,1, 2, 3       |
+| 3     | 0, 1, 2, 3       |
+
+We can try and halve the possible numbers for each index.
+
+Using the same technique as we used with length 2, let's just steal half the numbers.
+
+```
+Enter numbers to steal: 0 1
+Stolen: 3 0
+```
+
+We know now that indices 0 and 1 must have 3 or 0, and indices 2 and 3 musthave 1 or 2.
+
+| Index | Possible numbers |
+| ----- | ---------------- |
+| 0     | 0, 3             |
+| 1     | 0, 3             |
+| 2     | 1, 2             |
+| 3     | 1, 2             |
+
+We have 2 groups of indices based on their possible numbers: `[0, 1]` both have the same candidates,
+and same goes for `[2, 3]`.
+
+For each group, notice that we can do exactly what we did for length 2!
+Steal half of the indices, which reduces the possible numbers from 2 to 1.
+
+The process for both groups can be done in **one steal**!
+
+```
+Enter numbers to steal: 0 2
+Stolen: 0 1
+```
+
+Given an index's possible numbers, its possible numbers after the steal are determined by the following:
+
+1. If we stole the index, its new possible numbers will be all the numbers thatwere possible that **WERE**
+   returned by the steal. We just stole that index, so its number must be in the response.
+2. Otherwise, its new possible numbers will be all the numbers that werepossible that **WERE NOT** returned
+   by the steal. That index's number cannot be in the response because we didn't steal that index.
+
+Let's use this process to finalize our table.
+
+| Index | Possible numbers |
+| ----- | ---------------- |
+| 0     | 0                |
+| 1     | 3                |
+| 2     | 1                |
+| 3     | 2                |
+
+In two steals, we have deduced the entire shuffled array of 4 numbers.
+
+With an array of length 8, we can query half of the indices to halve the possible numbers to 4.
+Then, we perform the same steps just described for length 4, but across the two halves at the same time.
+
+For an array of length 2, we need 1 steal.
+
+For an array of length 4, we need 2 steals.
+
+For an array of length 8, we need 3 steals.
+
+For an array of length 2<sup>n</sup>, we need n steals.
+
+For an array of length n, we need log<sub>2</sub>(n) steals.
+
+**Exactly the number we have.**
+
+### Script
+
+We have all the intuition we need in order to solve this challenge.
+
+```python
+from pwn import *
+from collections import defaultdict
+
+class Remote:
+    def __init__(self):
+        # infra disabled after CTF ended
+        # self.conn = remote('ctf.k3rn3l4rmy.com', 2247)
+        self.conn = process(['python3', 'main.py'])
+
+    def steal(self, idxs):
+        """Given a list of indices to steal, return the set of numbers that are in those indices."""
+        self.conn.sendline(b'1')
+        query_str = ' '.join(map(str, idxs))
+        self.conn.sendline(query_str.encode('ascii'))
+
+        self.conn.recvuntil(b'Stolen: [')
+        resp = self.conn.recvuntilS(b']')[:-1]
+        return set(map(int, resp.split(', ')))
+
+    def guess(self, nums):
+        """Guess the given list of numbers and return the server's response."""
+        self.conn.sendline(b'2')
+        self.conn.sendline(' '.join(map(str, nums)))
+        self.conn.recvuntil(b'What is the list: ')
+        return self.conn.recvlineS().strip()
+
+def main():
+    LEN = 10**4
+    r = Remote()
+
+    # for each index i of the list, candidates[i] is the set of numbers it could possibly be
+    candidates = [frozenset(range(LEN))] * LEN
+
+    # repeat while we have any indices with more than one possible number
+    while any(len(s) > 1 for s in candidates):
+        print('Maximum candidate set size:', max(map(len, candidates)))
+
+        # find the sets of indexes that have the same candidate set
+
+        # this allows us to halve the length of each candidate set by
+        # querying half of the indexes for each candidate set
+
+        groups = defaultdict(list)
+        for i, cand_set in enumerate(candidates):
+            groups[cand_set].append(i)
+
+        # steal half of the indexes for each group
+        query = set()
+        for idxs in groups.values():
+            query.update(idxs[::2])
+
+        resp_set = r.steal(query)
+
+        # if the index was queried: its number will be in the response.
+        # therefore, its new candidate set is the intersection of its old one and the response.
+
+        # otherwise: its number must not be in the response.
+        # its new candidate set are the numbers that are in the old candidate
+        # set but not in the response. this is the set difference.
+
+        for i in range(LEN):
+            if i in query:
+                candidates[i] &= resp_set
+            else:
+                candidates[i] -= resp_set
+
+    # all indices have only one candidate number;
+    # we know the list.
+    deduced = [list(s)[0] for s in candidates]
+    print(r.guess(deduced))
+
+main()
+```
+
+Output:
+
+```
+Maximum candidate set size: 10000
+Maximum candidate set size: 5000
+Maximum candidate set size: 2500
+Maximum candidate set size: 1250
+Maximum candidate set size: 625
+Maximum candidate set size: 313
+Maximum candidate set size: 157
+Maximum candidate set size: 79
+Maximum candidate set size: 40
+Maximum candidate set size: 20
+Maximum candidate set size: 10
+Maximum candidate set size: 5
+Maximum candidate set size: 3
+Maximum candidate set size: 2
+flag{m0d1f13d_b1n4ry_s34rch!}
+```
+
+### Script - gotta go faster
+
+After the CTF ended, I was unsatisfied with my solution - the script takes ~9 seconds to run!
+There must be a faster way.
+
+As it turns out, most of the time is spent computing the set intersections and differences
+for the candidates. This takes a long time when the candidates are large.
+
+However, most of the time, the candidates are the same for multiple indices!
+
+Instead of calculating the intersection/difference for each index, we can group indices based
+on their candidates and calculate the set intersection/difference twice per group -
+an intersection for the stolen indices, and a difference for the unstolen ones.
+
+Let's do that to speed up our solve script.
+
+```python
+from pwn import *
+from collections import defaultdict
+
+class Remote:
+    # same as previous, hiding to save space
+    pass
+
+def main():
+    LEN = 10**4
+    r = Remote()
+
+    # each entry into the layer dict is:
+    #   set of indices -> set of possible candidates for those indices )
+    layer = {frozenset(range(LEN)): frozenset(range(LEN))}
+
+    # if the length of the layer is LEN, then we must have 1 candidate per set
+    # and the set must contain only one number
+    while len(layer) < LEN:
+        # for each set of indices (call them group) in the layer, steal half of them
+        # keep track of the stolen and unstolen sets of indices
+        stolen_groups = []
+        unstolen_groups = []
+
+        for group in layer:
+            stolen_idxs = frozenset(list(group)[::2])
+            unstolen_idxs = group - stolen_idxs
+
+            stolen_groups.append(stolen_idxs)
+            unstolen_groups.append(unstolen_idxs)
+
+        to_steal = [idx for group in stolen_groups for idx in group]
+        resp_set = r.steal(to_steal)
+
+        # the new layer will be keyed by the stolen/unstolen groups
+        # same logic as previous solution
+        new_layer = {}
+        for i, group in enumerate(layer):
+            # the stolen/unstolen groups could be empty, but that's not a problem
+            candidates = layer[group]
+            new_layer[stolen_groups[i]] = candidates & resp_set
+            new_layer[unstolen_groups[i]] = candidates - resp_set
+
+        layer = new_layer
+
+    # we now have only one candidate per group
+    # and each group has only one index
+    deduced = []
+    for i in range(LEN):
+        candidate_set = layer[frozenset([i])]
+        deduced.append(list(candidate_set)[0])
+
+    print(r.guess(deduced))
+
+main()
+```
+
+Now this only takes 0.26 seconds.
+
+Thanks for reading! Hope you enjoyed my thought process and approach for this challenge.
