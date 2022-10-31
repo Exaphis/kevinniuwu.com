@@ -1,0 +1,123 @@
+---
+title: "Redirecting the Discord overlay"
+layout: ../../layouts/BlogLayout.astro
+date: "2019-06-21"
+---
+
+Throughout my span of time developing game cheats, I have been obsessed with one thing: stealth.
+In an ideal world, the most secure overlay would be no overlay, but where’s the fun in that?
+
+Recently, I’ve been improving the security of my own overlay.
+There are way too many detection vectors for a window you create yourself:
+window attributes, window titles, you name it.
+Even more crafty methods of creating an overlay are rumored to be detected,
+such as [window hijacking](https://www.unknowncheats.me/forum/anti-cheat-bypass/270259-window-hijacking-directx-rendering-hdc-usable-detection.html)
+and hooking other legitimate overlays such as Steam’s in-game overlay.
+
+_Sidenote_: this post was created for Discord version 0.0.305—the whole overlay system may be subject to change.
+
+Discord uses `node.js` behind the scenes, and its overlay is just a webpage that connects
+to the Discord app on your computer through RPCs.
+The important files that Discord uses are located in `C:\Users\{username}\AppData\Roaming\discord\{version}\modules\discord_overlay2`.
+
+The C++ addon module `discord_overlay2.node` is used to connect and control overlays injected into games.
+Most of the heavy lifting is done by `host.js`, which contains the all-important function `createRenderer(pid, url)`.
+
+```javascript
+var Overlay = require('./discord_overlay2.node');
+var renderers = {};
+
+[...]
+
+function createRenderer(pid, url) {
+  if (renderers[pid]) {
+    return;
+  }
+
+  var _require2 = require('url'),
+      URL = _require2.URL;
+
+  var urlWithPid = new URL(url);
+  urlWithPid.searchParams.append('pid', pid.toString());
+  url = urlWithPid.toString();
+
+  renderers[pid] = {
+    pid: pid,
+    url: 'file://' + __dirname + '/start.html?pid=' + pid.toString(),
+    overlayURL: url,
+    backoff: new Backoff(1000, 30000),
+    window: new BrowserWindow({
+      show: false,
+      skipTaskbar: true,
+      webPreferences: {
+        offscreen: true,
+        transparent: true,
+        nodeIntegration: false,
+        preload: path.join(__dirname, '..', 'discord_desktop_core', 'core.asar', 'app', 'mainScreenPreload.js')
+      }
+    })
+  };
+
+  var renderer = renderers[pid];
+
+  Overlay.connectProcess(pid);
+
+  if (renderer.window.webContents._setDiscordOverlayProcessId) {
+    renderer.window.webContents._setDiscordOverlayProcessId(pid);
+  }
+
+  // "paint" event will be skipped if direct frame delivery is enabled.
+
+  renderer.window.webContents.on('crashed', function (e, killed) {
+    Overlay.logMessage('Overlay for pid ' + renderer.pid + ' crashed' + (killed ? ' (killed)' : ''));
+    Overlay.sendCommand(renderer.pid, { message: 'relay', _relay: 'renderer_crashed' });
+    destroyRenderer(pid);
+  });
+  renderer.window.webContents.on('console-message', function (_event, _level, message, _line_no, _source_id) {
+    Overlay.logMessage('OverlayRenderer[' + pid + ']: ' + message);
+  });
+
+  renderer.window.webContents.on('paint', function (_event, _dirty, image, _legacy_width, _legacy_height) {
+    // [adill] support electron <=1.8.4 which sent a (buffer, width, height) instead of (image)
+    if (Buffer.isBuffer(image)) {
+      var width = _legacy_width;
+      var height = _legacy_height;
+      Overlay.sendFramebuffer(renderer.pid, image, width, height);
+      return;
+    }
+
+    Overlay.sendFramebuffer(renderer.pid, image.getBitmap(), image.getSize().width, image.getSize().height);
+  });
+
+  renderer.window.webContents.on('new-window', function (e, url) {
+    e.preventDefault();
+    webContentsSend(renderer.window, 'REQUEST_OPEN_EXTERNAL_URL', url);
+  });
+
+
+  renderer.window.loadURL(renderer.url);
+}
+```
+
+We can see the overlay is indeed just a webpage that is painted onto the screen.
+By simply replacing value of the newly created renderer object’s overlayURL property with your own HTML file,
+you can render whatever you want.
+
+```javascript
+renderers[pid] = {
+    pid: pid,
+    url: 'file://' + __dirname + '/start.html?pid=' + pid.toString(),
+    overlayURL: 'file:///C:/Users/{username}/custom_overlay.html,
+    backoff: new Backoff(1000, 30000),
+    window: new BrowserWindow({
+      show: false,
+      skipTaskbar: true,
+      webPreferences: {
+        offscreen: true,
+        transparent: true,
+        nodeIntegration: false,
+        preload: path.join(__dirname, '..', 'discord_desktop_core', 'core.asar', 'app', 'mainScreenPreload.js')
+      }
+    })
+  };
+```

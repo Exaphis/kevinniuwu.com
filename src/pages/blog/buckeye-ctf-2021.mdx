@@ -1,0 +1,406 @@
+---
+title: "BuckeyeCTF 2021 Writeups"
+layout: ../../layouts/BlogLayout.astro
+date: "2021-10-25"
+---
+
+I played in BuckeyeCTF as part of b01lers. A big thank you to the organizers for a fun weekend!
+
+## Table of Contents
+
+# Rev
+
+## Neurotic (33 solves, medium)
+
+### Challenge description
+
+I'm sure neural nets are great for encryption!
+
+Attached files:
+[src.py](https://raw.githubusercontent.com/cscosu/buckeyectf-2021/master/rev/neurotic/dist/src.py),
+[model.pth](https://github.com/cscosu/buckeyectf-2021/blob/master/rev/neurotic/src/model.pth?raw=true)
+
+### Solve
+
+tl;dr: math
+
+The neural network is taking in the flag, performing some calculations,
+and outputting some data. How can we invert the process?
+
+With Google, of course!
+
+[This StackOverflow question](https://stackoverflow.com/q/59878319) was extremely helpful in solving the challenge.
+As it turns out, we can use the same approach here: same number of input and output neurons,
+and the activation function is invertible.
+
+While copying the code from StackOverflow, I was quite confused as to why the list returned by `model.stack.children()`
+was only one long. It took me a few minutes to realize that in the NeuralNetwork constructor,
+multiplying the list by 7 means that each layer refers to the same object.
+Therefore, we can multiply the list by 7 while going in reverse,
+and we don't care about order anymore since every object is the same.
+
+Solve script:
+
+```python
+import torch
+from torch import nn
+import numpy as np
+from functools import reduce
+import base64
+
+
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super(NeuralNetwork, self).__init__()
+        self.stack = nn.Sequential(*([nn.Linear(8, 8, bias=False)] * 7))
+
+    def forward(self, x):
+        x = self.stack(x)
+        return x
+
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+model = NeuralNetwork().to(device)
+model.load_state_dict(torch.load("model.pth"))
+
+# https://stackoverflow.com/questions/59878319/can-you-reverse-a-pytorch-neural-network-and-activate-the-inputs-from-the-output
+out = '1VfgPsBNALxwfdW9yUmwPpnI075HhKg9bD5gPDLvjL026ho/xEpQvU5D4L3mOso+KGS7vvpT5T0FeN284inWPXyjaj7oZgI8I7q5vTWhOj7yFEq+TtmsPaYN7jxytdC9cIGwPti6ALw28Pm9eFZ/PkVBV75iV/U9NoP4PDoFn72+rI8+HHZivMwJvr2s5IQ+nASFvhoW2j1+uHE98MbuvdSNsT4kzrK82BGLvRrikz6oU66+oCGCPajDmzyg7Q69OjiDPvQtnjxwWw2+IB9ZPmaCLb4Mwhc+LimEPXXBQL75OQ8/ulQUvZZMsr3iO88+ZHz3viUgLT2U/d68C2xYPQ=='
+
+y = np.frombuffer(base64.b64decode(out), dtype=np.float32).reshape((8, 8)).copy()
+z = torch.from_numpy(y)
+
+for step in list(model.stack.children()) * 7:
+    # z = z - step.bias[None, ...] (no bias for us)
+    z = z[..., None]  # 'torch.solve' requires N column vectors (i.e. shape (N, n, 1)).
+    z = torch.linalg.solve(step.weight, z)
+    z = torch.squeeze(z)  # remove the extra dimension that we've added for 'torch.solve'.
+
+vals = z.detach().numpy().reshape(64)
+print(''.join(chr(round(x)) for x in vals))
+```
+
+Flag: `buckeye{w41t_1ts_4ll_m4tr1x_mult1pl1cat10n????_4lwy4y5_h4s_b33n}`
+
+# Web
+
+## Tesseract (60 solves, easy)
+
+### Challenge description
+
+Check out our OCR-as-a-service!
+
+[https://tesseract.chall.pwnoh.io](https://tesseract.chall.pwnoh.io)
+
+Source: [https://github.com/cscosu/buckeyectf-2021/tree/master/web/tesseract](https://github.com/cscosu/buckeyectf-2021/tree/master/web/tesseract)
+
+### Solve
+
+tl;dr: Shell command injection
+
+Looking through the source, we see a command injection vulnerability.
+
+![Vulnerability in the code](https://i.imgur.com/DHn3wrB.png)
+
+The key aspect is the `shell=True` argument.
+[The subprocess docs make a note of this potential vulnerability](https://docs.python.org/3/library/subprocess.html#security-considerations).
+
+As a result, we can upload a file with the name `' || cat flag.txt && '` to get the flag.
+The code will run `tesseract '' || cat flag.txt && '' || cat flag.txt && '' -l eng`,
+which will have a non-zero return code and display the output.
+
+![Successful command injection output](https://i.imgur.com/Tl0XsUZ.png)
+
+Flag: `buckeye{5an1t1ze_y0ur_c0mm4nds_or_just_d0nt_use_c0mm4nds_1n_th3_f1r5t_p1ac3}`
+
+## StegBot (54 solves, easy)
+
+### Challenge description
+
+Everybody loves [steghide](https://github.com/perfectblue/ctf-writeups/tree/master/2020/csaw-quals-2020/take-it-easy#step-3),
+so I made **StegBot#2632** so that you can use it from Discord! Make sure to join our
+[Discord server](https://discord.gg/WyUcFqrDjP) if you haven't already, and DM `/info` to StegBot to get started.
+
+### Solve
+
+tl;dr: `file://` protocol
+
+StegBot accepts three different commands: `/info`, `/embed`, and `/extract`.
+
+Sending the /info command to StegBot gives us a link to its source code: http://github.com/qxxxb/StegBot
+
+`/embed` takes in an `image_url`, and two optional arguments: `message` and `password`.
+Interestingly, if `message` is not supplied, the bot will give you back the image you sent it. This might be useful later.
+
+`/extract` takes in two arguments: `image_url` and `password`. It calls steghide to extract the data embedded in an image.
+
+Where is the flag? Before the bot starts, `stegEmbed` is called on `bof.jpg` located on the server,
+with the flag as the message a randomly generated password.
+We'll need to find the location on the server where the new image is stored and what the password was.
+
+Looking more closely, we see a suspicious function:
+
+![downloadFile function](https://i.imgur.com/MDdCLRd.png)
+
+`downloadFile` is called by `/embed` and `/extract` to download the images from the given URLs.
+curl can actually copy files for us by using the `file:// protocol`: `curl file://<absolute_filepath> -o <output>`.
+We can abuse this to have the bot give us a file on the server.
+
+Let's test by sending StegBot `/embed image_url:file:///etc/passwd`.
+No message is given so StegBot gives us back the "image" it "downloads".
+
+![StegBot response](https://i.imgur.com/AsSFOMW.png)
+
+Opening the file gives us the contents of `/etc/passwd`. We're in.
+
+Another two suspicious lines:
+
+![logger instantiation](https://i.imgur.com/L040AX6.png)
+
+![logging passwords](https://i.imgur.com/vZmfRu4.png)
+
+logger nicely logs all images, outputs, and passwords passed into `stegEmbed`!
+We can use this to find the location of the image where the flag is embedded as well as the password used.
+Let's use our file access trick from earlier to get the contents of `/app/app.log` (`/embed image_url: file:///app/app.log`).
+
+```
+{"level":30,"time":1635135715767,"pid":1,"hostname":"NSJAIL","imagePath":"bof.jpg","outputPath":"/tmp/images/bd15e11499c9abf6dc94c22025824ca5.jpg","password":"389c08e3094e41c3022d55ee7c25aa8b"}
+{"level":30,"time":1635138043700,"pid":1,"hostname":"NSJAIL","imagePath":"/tmp/images/aa4fcc7c4c01f91f3b8a64bbde05fee4.jpg","outputPath":"/tmp/images/7ad58dbe201bee205c6be7530cbea108.jpg","password":"meow"}
+```
+
+Bingo. Finish this off by extracting the flag from the image:
+`/extract image_url: file:///tmp/images/bd15e11499c9abf6dc94c22025824ca5.jpg password: 389c08e3094e41c3022d55ee7c25aa8b`
+
+![stegbot flag output](https://i.imgur.com/Lf0IEev.png)
+
+Flag: `buckeye{d0wnl0ad1ng_f1l3s_fr0m_n0d3_w4s_t00_h4rd_s0_1_ju5t_u53d_curl}`
+
+## Jupyter (16 solves, medium)
+
+### Challenge description
+
+Upload a Jupyter notebook and the admin bot will take a look at it :)
+
+URL: [http://3.21.105.111](http://3.21.105.111)
+
+Note: Try to be gentle with the server
+
+Attachments: [jupyter2.zip](https://github.com/cscosu/buckeyectf-2021/blob/master/web/jupyter/dist/jupyter.zip?raw=true)
+
+### Solve
+
+tl;dr: XSS in a Jupyter notebook cell
+
+![upload notebook button](https://i.imgur.com/byELQSL.png)
+
+The premise is pretty simple: you upload a Jupyter notebook, and the admin will open it.
+
+Has anyone wanted to auto-run code in a Jupyter notebook on open?
+A quick Google search later, the answer is yes. [StackOverflow saves the day again](https://stackoverflow.com/a/38856870).
+
+The comments mention that the notebook needs to be "trusted," whatever that means. Is that going to be a problem for us?
+
+![upload_ipynb function](https://i.imgur.com/PdQjm1R.png)
+
+(line 24) Turns out not.
+
+It's now just a matter of piecing together the auto-run all cells answer and some code that POSTs
+the contents of some command to a request bin.
+
+![auto-run code in a jupyter notebook](https://i.imgur.com/Y5jVI4N.png)
+
+Digging around, we can find the location of the flag and send that to our request bin.
+
+![request bin result](https://i.imgur.com/v71YFbP.jpg)
+
+Flag: `buckeye{JUp1t3r_n0t3b0ok_funNy_bu51n3sS}`
+
+## Curly fries (8 solves, medium)
+
+### Challenge description
+
+It's curl as a service
+
+`nc web.chall.pwnoh.io 13372`
+
+Attachments: [curly_fries.zip](https://github.com/cscosu/buckeyectf-2021/blob/master/web/curly_fries/dist/curly_fries.zip)
+
+### Solve
+
+tl;dr: Incorrect Content-Length header detection, heap data re-use
+
+Once we connect to the server, we're prompted for a URL for it to curl.
+Afterwards, the server gives us the response headers as well as its contents.
+
+Taking a look at the source, there are a few interesting finds.
+Before the URL is fetched, a `verify_flag_file` function is run that mallocs a 1024-byte buffer
+and reads the flag into it. It checks that the read-in flag starts with the correct string and finally frees the buffer.
+
+curly_fries uses libcurl to fetch the headers and the response data of a URL.
+Upon receiving a `Content-Length` header, a buffer of the right size is allocated to hold the response data.
+After all data is received, the contents of the response buffer is printed out with `puts`.
+
+![header_callback function](https://i.imgur.com/5NMzvPN.png)
+
+The Content-Length header checks at line 26/27 are incorrect.
+If we send a header field such as `Content-Lengthw: 1023`,
+the allocation of a 1024-byte buffer for response will occur,
+but curl won't recognize this as a valid Content-Length header so it won't error if we don't send enough data.
+
+`malloc` should now give us back the buffer that contained the flag contents that were read from `verify_flag_file()`,
+and it won't be overwritten by our response! But can we output this?
+
+According to the [curl docs for the write callback](https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html),
+the data given to it is not null-terminated.
+This is perfect as the null-termination for the buffer before printing done by `curly_fries`
+is only at the end of `response_buf`, which it thinks is 1024 bytes long.
+
+Lastly, the first 16 bytes in the response buffer will be null bytes as `malloc`
+internally uses two pointers at the start of each free chunk to keep track of them.
+We will need to send 16 characters in our response to zero these out.
+
+Putting all of this together, we get the solve script:
+
+```python
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+s.bind(('0.0.0.0', 6969))
+s.listen()
+
+conn, addr = s.accept()
+print('Accepted connection.')
+with conn:
+    data = b''
+    while not data.endswith(b'\r\n\r\n'):
+        data += conn.recv(1)
+
+    print(data)
+
+    conn.sendall(
+        b'HTTP/1.1 200 OK\r\n'
+        b'Content-Lengthw: 1023\r\n'
+        b'\r\n' + b'a'*16
+    )
+
+s.close()
+```
+
+And giving a URL pointing to this script to curly_fries gets us our flag.
+
+![curly_fries solve](https://i.imgur.com/P5Fzbbr.png)
+
+Flag: `buckeye{https://secret.club/2021/05/13/source-engine-rce-join.html}`
+
+# Crypto
+
+## Key exchange 2 (34 solves, easy)
+
+### Challenge description
+
+No public key this time!
+
+`nc crypto.chall.pwnoh.io 13386`
+
+Attachments: [server.py](https://github.com/cscosu/buckeyectf-2021/raw/master/crypto/key_exchange_2/dist/server.py)
+
+### Solve
+
+tl;dr: small subgroup attack
+
+We're performing Diffie Hellman key exchange. However, we're not given A's public key!
+Can we still figure out the shared secret?
+
+For a basic primer on DHKE and the math behind it, take a look at the
+[Wikipedia page](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange#Cryptographic_explanation).
+
+The major problem is that we don't know $A$ anymore.
+Let's take a look at what we have control over and see if we can use some trick to find the shared secret.
+
+Alice is calculating the shared secret using the equation $s=B^a \mod p$. $p$ is given to us and we also have control over $B$ as we're playing the role of Bob.
+Is there any way to set $B$ in some way (according to the code,
+$B$ must be between $2$ and $p-2$) to be able to find value of $s$ given an arbitrary $a \in [2, p-1)$?
+
+Not exactly, but we can get close.
+
+**Concrete examples**
+
+Let $p=31$. If we set $B=25$, what possible values for $s$ do we have?
+
+$B^2 = 625,\; 625 \equiv 5 \mod p$
+
+$B^3 =15625,\; 15625 \equiv 1 \mod p$
+
+$B^4=390625,\; 390625 \equiv 25 \mod p$
+
+$B^5=9765625,\; 9765625 \equiv 5 \mod p$
+
+Hold on, we've looped back around! If you continue for the possible values of $p$, you'll se that $s$ can only have three possible values: 5, 1, and 25. If we can constrain our $s$ to only have a few possible values, then that means we can try all of them to see which one work to decrypt the ciphertext.
+
+Solve script:
+
+```python
+import hashlib
+import Crypto.Util.number as cun
+from Crypto.Cipher import AES
+import binascii
+import sys
+from pwn import *
+
+r = remote('crypto.chall.pwnoh.io', 13386)
+r.recvuntil('p = ')
+p = int(r.recvlineS().strip())
+print(f'p = {p}')
+
+r.recvuntil('public key B: ')
+
+# Z_p^* has a subgroup of order d for each divisor d of p-1
+# we want a small order, so choose the smallest divisor of p - 1 greater than 2
+for i in range(3, 100000):
+    if (p - 1) % i == 0:
+        order = i
+        break
+else:
+    print('Failed, no groups with order < 100000')
+    sys.exit(1)
+
+print(f'Found subgroup of order {order}')
+
+# now, find a generator of this subgroup
+# https://github.com/miha-stopar/crypto-notes/blob/master/number_theory.md#finding-a-generator-of-a-subgroup
+for y in range(1, 50):
+    g = pow(y, (p-1)//order, p)
+    if g != 1 and g != p-1:
+        break
+else:
+    print('Failed to find generator')
+    sys.exit(1)
+
+print(f'Found generator: {g}')
+
+# g is a generator for our small subgroup, so send g as B's public key so we can brute
+# force the shared secret.
+r.sendline(str(g).encode('ascii'))
+
+r.recvuntil(b'ciphertext = ')
+ciphertext = binascii.unhexlify(r.recvlineS().strip())
+r.close()
+
+for i in range(1, order + 1):
+    shared_secret = pow(g, i, p)
+
+    key = hashlib.sha1(cun.long_to_bytes(shared_secret)).digest()[:16]
+    cipher = AES.new(key, AES.MODE_ECB)
+    plaintext = cipher.decrypt(ciphertext)
+
+    if plaintext.startswith(b'buckeye'):
+        print(plaintext)
+        break
+else:
+    print("Couldn't find flag.")
+```
+
+![output of solve script](https://i.imgur.com/ZcLsMMQ.png)
+
+Flag: `buckeye{sup3r_dup3r_t1ny_m1cr0sc0p1c_subgr0up5!}`

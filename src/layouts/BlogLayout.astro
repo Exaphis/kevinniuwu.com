@@ -18,6 +18,12 @@ const { frontmatter, home } = Astro.props;
       @import url("https://rsms.me/inter/inter.css");
       @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap");
     </style>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"
+      integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ"
+      crossorigin="anonymous"
+    />
     <script
       async
       defer
@@ -59,7 +65,7 @@ const { frontmatter, home } = Astro.props;
 
         ul,
         ol {
-          @apply mt-4 ml-4 list-inside;
+          @apply ml-4 list-inside;
         }
 
         ol {
@@ -76,15 +82,11 @@ const { frontmatter, home } = Astro.props;
           @apply mt-4;
         }
 
-        li {
-          @apply mt-2;
-        }
-
         pre {
           @apply text-sm;
         }
 
-        .footnotes p {
+        li p {
           @apply mt-0 inline-block;
         }
 
