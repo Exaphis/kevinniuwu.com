@@ -13,11 +13,10 @@ const { frontmatter, home } = Astro.props;
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="description" content="Kevin Wu's blog." />
+    <meta name="author" content="Kevin Wu" />
+    <meta name="viewport" content="width=device-width" />
     <title>{frontmatter?.title || "Kevin Wu's Blog"}</title>
-    <style>
-      @import url("https://rsms.me/inter/inter.css");
-      @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap");
-    </style>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"

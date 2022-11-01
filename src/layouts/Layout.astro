@@ -15,7 +15,7 @@ const { title, bodyClass } = Astro.props as Props;
     <meta name="author" content="Kevin Wu" />
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
-    <style>
+    <style is:global>
       @import url("https://rsms.me/inter/inter.css");
       @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap");
     </style>
