@@ -1,0 +1,172 @@
+---
+title: "Refer, rinse, repeat: doing my laundry for free"
+layout: ../../layouts/BlogLayout.astro
+date: "2022-12-04"
+---
+
+The washers and dryers at my apartment complex cost an outrageous \$1.85 per wash
+and another \$1.85 per dry.
+
+Almost \$4 per laundry trip? _In this economy?_
+
+Fortunately, this poster is hung up in the laundry room:
+
+![Poster indicating you can get a free wash and dry](https://i.imgur.com/5HSxHuH.jpg)
+
+Let's see if we can get free laundry out of this, shall we?
+
+## Investigating the referral system
+
+Once we download the app and sign up with a new account, we can click the "Get Free
+Laundry" tab on the sidebar and get sent to this page:
+
+![Page detailing CSCPay's referral program](https://i.imgur.com/PEM9a7s.jpg)
+
+So we can get free money by referring someone! Testing this manually shows that it works,
+but there's some kind of detection for accounts created on the same device.
+
+Let's see how this works in the app's code. Maybe we can find a way to create accounts
+automatically.
+
+## Decompiling the app
+
+```
+$ jadx --show-bad-code --deobf --deobf-use-sourcename \
+  --deobf-parse-kotlin-metadata cscpay_2.16.1.apk
+INFO  - loading ...
+INFO  - processing ...
+ERROR - finished with errors, count: 9
+```
+
+With everything decompiled by [jadx](https://github.com/skylot/jadx),
+we can open it up in Android Studio and poke around.
+
+Conveniently, in `ApiInterface.java`, we can find an interface for all the API calls that
+the app makes (thanks to them using [retrofit2](https://square.github.io/retrofit/)).
+
+## Signing up
+
+Using an emulator and [Burp Suite](https://portswigger.net/burp), we can see that the app makes a POST request
+to `api/auth/register_device_check` upon signup.
+
+```java
+@POST("api/auth/register_device_check")
+Call<NormalResponse> registeCommrWithEmail(@Header("X-API-KEY") String str, @Body Map<String, String> map);
+```
+
+Let's see where `registeCommrWithEmail`, the interface function that makes this request, is called in the code.
+
+```java
+setBgAndText(this.mEmail, 2, this.llEmail, this.tipEmail, this.imageEmail, "Email");
+setBgAndText(this.mPassword, 2, this.llPassword, this.tipPassword, this.imagePassword, "Password");
+AnalyticsUtil.email(this, str);
+AnalyticsUtil.regSubmit(this, str, str2, Constants.STANDARD, Constants.NewLogin);
+HashMap hashMap = new HashMap();
+hashMap.put("email", str);
+hashMap.put("password", str2);
+hashMap.put("confirm_password", str2);
+hashMap.put("sitecode", AppConfig.SITE_CODE);
+hashMap.put(Constants.LOCATION_CODE, AppConfig.LOCATION_CODE);
+hashMap.put("app_type", "2");
+hashMap.put("referring_uid", AppConfig.referring_uid);
+hashMap.put("app_token", AppConfig.uniqueID);
+LoadingDialog.show(this, "Creating Account");
+WbApiModule.registeCommrWithEmail(new C10725(str, str2), hashMap);
+```
+
+What are the parameters put in the hashmap?
+
+`app_token` might be the device ID. Investigating further, we see that `AppConfig.uniqueID`
+is set to a UUID generated from `Settings.Secure.ANDROID_ID`. [This is a unique constant
+for each device (almost)](https://stackoverflow.com/a/43393373).
+When we create our new accounts, let's make sure to generate a new UUID for each one.
+
+From looking at the network requests, `sitecode` and `location_code` are constants identifying
+the apartment complex and the specific laundry room within it. We can set these to some dummy
+values found by looking at the network requests when registering an account after choosing a random
+apartment/laundry room.
+
+`referring_uid` is the only thing left that we need. How can we get our user ID?
+
+## Logging in
+
+The app makes a POST request to `api/auth/login` when we log in.
+
+```java
+@Headers({"Content-Type: application/json", "Cache-Control: no-cache"})
+@POST("api/auth/login")
+Call<SigninResponse> signin(@Header("X-API-KEY") String str, @Body Map<String, String> map);
+```
+
+Following the same process as before, the interface function `signIn`
+that makes the request is called in `SigninFormActivity.java`.
+
+```java
+private void signinRequest(String str, String str2) {
+    AnalyticsUtil.loginAttempt(this.mContext, str, Constants.STANDARD);
+    HashMap hashMap = new HashMap();
+    hashMap.put(FirebaseAnalytics.Event.LOGIN, str);
+    hashMap.put("password", str2);
+    emailStr = str;
+    pwdStr = str2;
+    AppConfig.USER_EMAIL = "";
+    if (WbApiModule.signinRequest(this.signinCallback, hashMap)) {
+        return;
+    }
+    this.progressBar.setVisibility(8);
+}
+```
+
+Tracing back, `str` is the email address and `str2` is the password.
+
+## Referring a user
+
+Finally, we can see that the app makes a POST request to `api/referral/set_referred_mark` when we
+say we've been referred. You know the drill.
+
+```java
+@FormUrlEncoded
+@POST("api/referral/set_referred_mark")
+Call<ResponseBody> setReferredMark(@Header("X-API-KEY") String str, @Field("token") String str2, @Field("user_id") String str3);
+```
+
+```java
+public static void setReferredMark(Callback<ResponseBody> callback) {
+    LogUtils.m101i("Retrofit", "setReferredMark...");
+    ((ApiInterface) retrofit.create(ApiInterface.class)).setReferredMark(AppConfig.WASHBOARD_KEY, AppConfig.USER_TOKEN, AppConfig.USER_ID).enqueue(callback);
+}
+```
+
+`AppConfig.USER_TOKEN` and `AppConfig.USER_ID` are set when we log in.
+
+## API details
+
+### What is the base URL?
+
+Easy. It's set to `AppConfig.WASHBOARD_URL`, which is set to https://digitalinsights.cscsw.com:443/.
+
+### What is X-API-KEY?
+
+Each request requires a header `X-API-KEY`, which is set to `AppConfig.WASHBOARD_KEY`.
+It's set to the response of this function:
+
+```java
+@Headers({"Cache-Control: no-cache"})
+@GET("api/security/api_key")
+Call<WashboardKeyResponse> getNewApiKey(@Header("Authorization") String str, @Query("vendor_id") String str2);
+```
+
+`str` is the authorization token, which is set to `AppConfig.NEW_HEADER_AUTH2`, which is... hardcoded to `Basic YWRtaW46OTMxNQ==`.
+wtf? the username and password is just "admin" and "9314"?
+
+`str2` is the vendor ID, which is set to `AppConfig.VENDOR_ID`, which is always set to `20806`??
+
+## Putting it all together
+
+1. Get our own user ID by sending a request to the login endpoint with our email and password.
+2. Create a new account with our own user ID as the `referring_uid` parameter.
+3. Mark the new account as referred by sending a request to the referral endpoint with the new user's ID and token.
+4. ???
+5. Profit!
+
+![Successful referral](https://i.imgur.com/7uAGcaj.jpg)

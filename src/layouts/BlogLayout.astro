@@ -97,6 +97,10 @@ const { frontmatter, home } = Astro.props;
         th {
           @apply border-b-2 border-gray-400;
         }
+
+        img {
+          @apply mt-5 ml-auto mr-auto w-1/2 min-w-[300px];
+        }
       }
     </style>
   </head>
@@ -110,11 +114,11 @@ const { frontmatter, home } = Astro.props;
           Kevin Wu's Blog
         </a>
       )}
-      <a href="/" class="ml-2 blog-link">Home</a>
+      <a href="/" class="float-right blog-link">Home</a>
     </div>
     <div class="blogpost">
+      {frontmatter?.date && <p class="-mb-7 font-mono">{frontmatter.date}</p>}
       {frontmatter?.title && <h1>{frontmatter.title}</h1>}
-      {frontmatter?.date && <p>{frontmatter.date}</p>}
       <slot></slot>
     </div>
   </body>
