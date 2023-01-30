@@ -19,6 +19,7 @@ import SynchronousImg from "../images/synchronous.png";
 import TsunamiImg from "../images/tsunami.png";
 import TwoSigmaImg from "../images/twosigma.svg";
 import DEShawImg from "../images/deshaw.svg";
+import ScratchpadImg from "../images/scratchpad.png";
 // #endregion
 ---
 
@@ -97,30 +98,30 @@ import DEShawImg from "../images/deshaw.svg";
   </ul>
 
   <SectionPreview name="School" href="#school">
-    I'm currently a senior at Purdue University, double majoring in CS and Math.
-    I compete in capture-the-flag competitions with the b01lers CTF club.
+    I graduated from Purdue University, where I double majored in CS and Math. I
+    competed in capture-the-flag competitions with the b01lers CTF club.
   </SectionPreview>
   <SectionPreview name="Experience" href="#experience">
-    <!-- After graduation, I'll be working at D. E. Shaw as a software engineer. -->
-    Last summer, I was a software engineer intern at Two Sigma.
+    Last summer, I was a software engineer intern at Two Sigma. I'll be working
+    at D. E. Shaw as a software engineer full-time.
   </SectionPreview>
   <SectionPreview name="Projects" href="#projects">
-    My most recent project is Synchronous, a website where you can easily create
-    temporary workspaces to collaborate with teammates.
+    My most recent project is <code>scratchpad</code>, a website where you can
+    easily jot down notes for yourself and collaborate with others.
   </SectionPreview>
 
   <hr class="my-16 border-none" />
 
   <Section pretitle="01" title="School." id="school">
     <p slot="subtitle" class="text-lg">
-      I'm a senior at Purdue University, where I'm part of some cool clubs and
+      I just graduated from Purdue, where I was part of some cool clubs and
       groups.
     </p>
 
     <div class="flex justify-center items-center my-4">
       <Picture src={PurdueImg} widths={[750]} sizes={""} alt="Purdue logo" />
       <p class="min-w-fit">
-        Expected: Dec. 2022
+        Dec. 2022
         <br />
         B.S. in Computer Science
         <br />
@@ -151,8 +152,9 @@ import DEShawImg from "../images/deshaw.svg";
           />
         </div>
         <p>
-          I work in the Reliable and Secure Systems Lab with Prof. Pedro Fonseca
-          and Sishuai Gong on analyzing concurrency bugs in the Linux kernel.
+          I work in the Reliable and Secure Systems Lab with Sishuai Gong, Edwin
+          Lu, and Prof. Pedro Fonseca on analyzing concurrency bugs in the Linux
+          kernel.
         </p>
       </Card>
     </div>
@@ -226,6 +228,27 @@ import DEShawImg from "../images/deshaw.svg";
       I always have something fun in the works. Here are a few of my favorites.
     </p>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <Card href="https://scratchpad.kev3u.com">
+        <div class="picture-centered">
+          <Picture
+            src={ScratchpadImg}
+            widths={[128]}
+            sizes={"7em"}
+            alt="Scratchpad favicon"
+          />
+        </div>
+        <p>
+          Scratchpad lets you jot down notes in your browser, inspired by the
+          simple <code>contenteditable</code> bookmarklet. Notes are automatically
+          saved for later, and you can share your notes with others and collaborate
+          in real-time.
+        </p>
+        <div class="mt-auto">
+          <TechTag name="JavaScript" />
+          <TechTag name="Svelte" />
+          <TechTag name="Yjs" />
+        </div>
+      </Card>
       <Card>
         <div class="picture-centered">
           <Picture
