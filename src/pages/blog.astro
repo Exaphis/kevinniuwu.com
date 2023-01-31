@@ -1,20 +1,43 @@
 ---
-import BlogLayout from "../layouts/BlogLayout.astro";
+import BlogHomeLayout from "../layouts/BlogHomeLayout.astro";
 
 const posts = await Astro.glob("./blog/*");
 posts.sort((a, b) => b.frontmatter.date.localeCompare(a.frontmatter.date));
+
+let postByYear = new Map();
+for (let post of posts) {
+  const year = new Date(post.frontmatter.date).getFullYear();
+  if (!postByYear.has(year)) {
+    postByYear.set(year, []);
+  }
+  postByYear.get(year).push(post);
+}
+let sortedYears = [...postByYear.keys()].sort().reverse();
 ---
 
-<BlogLayout home>
-  <h1>Latest</h1>
-  <ul>
-    {posts.map((post) => {
-      const { title, date } = post.frontmatter
-      return (
-        <li>
-          <a href={post.url}>{title}</a> - {date}
-        </li>
-      )
-    })}
-  </ul>
-</BlogLayout>
+<BlogHomeLayout home>
+  {sortedYears.map((year) => (
+    <>
+      <h1 class="text-accent my-2 text-3xl font-semibold">{year}</h1>
+      <ul class="list-none">
+        {postByYear.get(year).map((post) => {
+          const { title, date } = post.frontmatter
+          const dateObj = new Date(date)
+          return (
+            <li>
+              <time datetime={date} class="text-accent float-right">
+                {dateObj.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </time>
+              <a href={post.url} class="visited:text-linkRead hover:underline">
+                {title}
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    </>
+  ))}
+</BlogHomeLayout>
