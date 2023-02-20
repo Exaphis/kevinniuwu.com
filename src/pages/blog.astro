@@ -25,7 +25,7 @@ let sortedYears = [...postByYear.keys()].sort().reverse();
           const dateObj = new Date(date)
           return (
             <li>
-              <time datetime={date} class="text-accent float-right">
+              <time datetime={date} class="text-accent float-right ml-2">
                 {dateObj.toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
