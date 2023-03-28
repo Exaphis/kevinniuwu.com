@@ -12,6 +12,13 @@ for (let post of posts) {
   }
   postByYear.get(year).push(post);
 }
+for (let postArr of postByYear.values()) {
+  postArr.sort(
+    (a, b) =>
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime()
+  );
+}
 let sortedYears = [...postByYear.keys()].sort().reverse();
 ---
 
@@ -21,21 +28,22 @@ let sortedYears = [...postByYear.keys()].sort().reverse();
       <h1 class="text-accent my-2 text-3xl font-semibold">{year}</h1>
       <ul class="list-none">
         {postByYear.get(year).map((post) => {
-          const { title, date } = post.frontmatter
-          const dateObj = new Date(date)
+          const { title, date } = post.frontmatter;
+          const dateObj = new Date(date);
           return (
             <li>
               <time datetime={date} class="text-accent float-right ml-2">
                 {dateObj.toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
+                  timeZone: "UTC", // use UTC as the Date constructor treats date-only strings as UTC
                 })}
               </time>
               <a href={post.url} class="visited:text-linkRead hover:underline">
                 {title}
               </a>
             </li>
-          )
+          );
         })}
       </ul>
     </>

@@ -1,0 +1,159 @@
+---
+title: "Free laundry 2: electronics boogaloo"
+layout: ../../layouts/BlogLayout.astro
+date: "2023-03-27"
+---
+
+_The sequel to [Refer, rinse, repeat: doing my laundry for free](/blog/laundry-refer)_
+
+I'm now in a new apartment, and I'm still doing my laundry for free. But this time,
+the laundry machine only takes physical laundry cards instead of a phone app.
+
+## Poking around
+
+Near the laundry room, there's a machine that will sell you laundry cards for \$5. After buying
+one and trying it out, I noticed that you had to tap the card on the machine once to display your balance,
+choose your washer/drying settings, then tap the card again to start the machine. This could mean that the
+card is storing some kind of data, and that the machine is writing to it when you tap it the second time.
+
+In that case, the card's balance is not checked by any central server — so if we can write to the card ourselves,
+then we can make it have any balance we want.
+
+Let's first check what kind of card we're working with.
+
+![A screenshot of NFC Tools, showing the card is a Mifare Classic 1k](https://i.imgur.com/hl6e7rD.png)
+
+Looks like it's a Mifare Classic 1k card, which is a type of RFID smart card. I've never worked with RFID before,
+so this should be interesting.
+
+After some quick research, it seems like the Mifare Classic 1k is a quite old, and
+[quite insecure](https://en.wikipedia.org/wiki/MIFARE#MIFARE_Classic), card.
+A very good sign!
+
+## Cloning the card
+
+The first step to cloning the data is to read it. Using the [MIFARE Classic Tool](https://play.google.com/store/apps/details?id=de.syss.MifareClassicTool&hl=en_US&gl=US)
+app, we can try to read the card's data. But, without the right keys, we can't get much.
+
+![A screenshot of MIFARE Classic Tool, showing the first 4 sectors are unreadable](https://i.imgur.com/xjGN5fX.png)
+
+Thus, I set out to buy an NFC card reader online and hook it up to my computer in order to crack the keys. A day later,
+with an [ACR122U](https://www.acs.com.hk/en/products/3/acr122u-usb-nfc-reader/) and a new Mifare Classic 1k card
+in hand, I was ready to go.
+
+The overview of the process is as follows:
+
+1. Crack the card's keys and dump its data using [mfoc](https://github.com/nfc-tools/mfoc)
+2. Write the data to a new card using [libnfc](https://github.com/nfc-tools/libnfc)'s `nfc-mfclassic` tool
+
+I made sure the new card had a **writable UID** - more on this later.
+
+### Prerequisites
+
+Note: I'm using Manjaro Linux, so the instructions may be slightly different for other distros.
+
+We'll first need to install [libnfc](https://github.com/nfc-tools/libnfc) and [mfoc](https://github.com/nfc-tools/mfoc).
+You should be able to follow the instructions on their respective READMEs.
+
+I had to build libnfc from source in order for it to be able to fully write to the card.
+[This seems like a common issue.](https://github.com/nfc-tools/libnfc/issues/564)
+
+To ensure that mfoc detects our self-built libnfc, you need to add `/usr/local/lib` to a file in `/etc/ld.so.conf.d/`.
+
+```shell
+$ echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/usrlib.conf
+```
+
+Then, run `sudo ldconfig` to update the library cache.
+
+Finally, when running `./configure` for mfoc, you need to also add `/usr/local/lib/pkgconfig` to the `PKG_CONFIG_PATH` variable.
+
+```shell
+$ ./configure PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+```
+
+At this point, you should be able to run `mfoc` and `nfc-mfclassic` without any issues.
+You can test that everything is working by running `nfc-list` while the card is on top of the reader.
+If it finds a ISO14443A passive target, then you're good to go!
+
+If you run into `error libnfc.driver.acr122_usb Unable to claim USB interface (Device or resource busy)`,
+then [you may need to unload the `pn533` driver](https://stackoverflow.com/a/33790442/6686559). This can be checked
+by running `lsmod | grep pn533`. If it's loaded, then you can unload it by running `sudo rmmod pn533`. You might have
+to remove `pn533_usb` as well.
+
+### Cracking the keys and reading the data
+
+As it turns out, each sector of the Mifare Classic card can have two different keys: key A and key B. We'll need both
+of these keys in order to clone the card fully.
+
+```shell
+$ mfoc -O original.mfd
+[...]
+Auth with all sectors succeeded, dumping keys to a file!
+[...]
+```
+
+After around 5 minutes, we have the keys and a dump of the card's data in `original.mfd`.
+
+### Writing the data
+
+Now that we have the data, we can write it to a new card.
+First, we need to get the keys of the card we're writing to by running `mfoc -O new.mfd`.
+Then, we can write the data to the card using `nfc-mfclassic`.
+
+```shell
+$ nfc-mfclassic W a u original.mfd new.mfd
+[...]
+Done, 64 of 64 blocks written.
+```
+
+The `W` flag tells `nfc-mfclassic` to write to the card (including block 0, which is normally locked).
+Remember that the blank card we bought earlier has a writable UID?
+This means that block 0 of the card is writable (going against the standard), making it so that we can clone the card perfectly.
+[More on this in this blog post.](https://brandonhinkel.com/2018/08/08/breaking-hardened-mifare-proxmark3.html#why-doesnt-the-card-work)
+
+Now we can try it on a real laundry machine!
+
+![A picture of a blank card showing a balance of $11.50](https://i.imgur.com/xJDXQ4X.jpg)
+
+Even after spending money on the real card, the balance is still the same.
+
+## Profit!
+
+Instead of stopping there, why not try to make the card have any arbitrary balance we want?
+To do this, I dumped the original card after I spent some money on it, and checked the difference between
+the two dumps.
+
+Before spending, the card had a balance of \$11.50. After spending, the card had a balance of \$9.00.
+
+```diff
+$ diff <(xxd original.mfd) <(xxd used.mfd)
+5c5
+< 00000040: 7e04 0100 81fb feff 7e04 [...]
+---
+> 00000040: 9d03 0100 62fc feff 9d03 [...]
+```
+
+We can see that there are a few bytes that are different between the two cards. Can you guess what the bytes mean?
+
+The first differing two bytes and last differing two bytes represent the balance in cents (little endian).
+
+```
+1150 to hex = 047e = 7e 04 (little endian)
+ 950 to hex = 039d = 9d 03 (little endian)
+```
+
+And the second differing byte must be a checksum of some sort - it's actually the bitwise NOT of the balance!
+
+```
+0x7e04 ^ 0xffff = 0x81fb
+0x9d03 ^ 0xffff = 0x62fc
+```
+
+If we want a balance of \$13.37 (1337, 0x0539), then we can set the balance bytes to `39 05` and the checksum to `C6 FA`.
+
+And the result is...
+
+![A picture of the laundry machine showing a balance of $13.37](https://i.imgur.com/J7Xu6EN.jpg)
+
+_Special thanks to [moorada tells things for this great blog post about hacking their own laundry machine card](https://moorada.github.io/hacking-nfc-card/index.html)_
