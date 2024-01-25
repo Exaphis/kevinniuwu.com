@@ -20,7 +20,7 @@ import TsunamiImg from "../images/tsunami.png";
 import TwoSigmaImg from "../images/twosigma.svg";
 import DEShawImg from "../images/deshaw.svg";
 import ScratchpadImg from "../images/scratchpad.png";
-import LeetcodeImprovedImg from "../images/leetcode-improved.png";
+import NYTogetherImg from "../images/nytogether.png";
 // #endregion
 ---
 
@@ -105,8 +105,9 @@ import LeetcodeImprovedImg from "../images/leetcode-improved.png";
     at Two Sigma and Citrix.
   </SectionPreview>
   <SectionPreview name="Projects" href="#projects">
-    My most recent project is <code>scratchpad</code>, a website where you can
-    easily jot down notes for yourself and collaborate with others.
+    My most recent project is <code>NYTogether</code>, a Chrome extension that
+    modifies the New York Times official crossword website to support
+    multiplayer crossword games.
   </SectionPreview>
 
   <hr class="my-16 border-none" />
@@ -233,20 +234,20 @@ import LeetcodeImprovedImg from "../images/leetcode-improved.png";
       I always have something fun in the works. Here are a few of my favorites.
     </p>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-      <Card href="https://github.com/Exaphis/leetcode-improved">
+      <Card href="https://github.com/Exaphis/nytogether">
         <div class="picture-centered">
           <Picture
-            src={LeetcodeImprovedImg}
+            src={NYTogetherImg}
             widths={[128]}
             sizes={"7em"}
-            alt="LeetCode Improved favicon"
+            alt="NYTogether logo"
           />
         </div>
         <p>
-          LeetCode Improved is a Chrome extension that makes life with the new
-          UI better. It adds quality-of-life improvements to the problem and
-          submission panes, and also re-adds features that were removed from the
-          old UI.
+          NYTogether is a Chrome extension that modifies the New York Times
+          official crossword website to support multiplayer crossword games. The
+          extension hooks into the website's Redux store to get the current game
+          state and sync it with other players.
         </p>
         <div class="mt-auto">
           <TechTag name="Plasmo" />
