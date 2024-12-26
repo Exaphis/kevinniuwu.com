@@ -1,0 +1,95 @@
+---
+title: "Cheating in New York Times Games by becoming Will Shortz"
+layout: ../../layouts/BlogLayout.astro
+date: "2024-12-26"
+---
+
+import { Image } from "astro:assets";
+import userDataImg from "../../assets/nyt-shortz/user_data.png";
+import overrideImg from "../../assets/nyt-shortz/override.png";
+import cwImg1 from "../../assets/nyt-shortz/crossword_header.png";
+import cwImg2 from "../../assets/nyt-shortz/crossword_settings.png";
+import cwImg3 from "../../assets/nyt-shortz/crossword_reveal.png";
+import spellingbee from "../../assets/nyt-shortz/spellingbee.webm";
+import connections from "../../assets/nyt-shortz/connections.webm";
+import strands from "../../assets/nyt-shortz/strands.webm";
+
+While developing [NYTogether](https://github.com/Exaphis/nytogether), I've been looking at the New York Times crossword
+internals fairly extensively. During development, I noticed one weird flag in the user data structure -
+`inShortzMode`. A cute homage to longtime crossword editor [Will Shortz](https://en.wikipedia.org/wiki/Will_Shortz), but what is it?
+
+Turns out I found a New York Times Games debugging feature! There's been [one inquisitive person who has discovered this previously in the Spelling Bee](https://old.reddit.com/r/NYTSpellingBee/comments/iovlmy/). But the "Shortz mode" feature also exists in the Crossword, Strands, and Connections games. Let's figure out what Shortz mode does in each.
+
+## Turning on Shortz mode
+
+The NYT Games website is a single page app built using React. Its game state is managed using React Redux. By installing the
+Redux DevTools extension, we're able to peer into the internals of the game:
+
+<Image src={userDataImg} alt="User data in Redux" />
+
+Next, searching for `shortz` in the Chrome network tab gives us a GET request to `https://www.nytimes.com/puzzles/shortz/...`.
+I wonder what would happen if you override the request to respond `true` instead of `false`?
+
+<Image
+  src={overrideImg}
+  alt="Overriding the request response in the Chrome Network Tab"
+/>
+
+Bingo! We've unlocked Shortz mode.
+
+<img
+  src="https://static01.nytimes.com/games/web/imgs/mobile/packs/pack_icons_shortz_favorites_2.png"
+  alt="Shortz icon"
+  style={{ width: "25%" }}
+/>
+
+## Shortz mode in the Crossword
+
+In the standard Crossword, the first thing different after enabling Shortz mode is edit/view JSON buttons next to the date of the crossword?
+
+<Image src={cwImg1} alt="New crossword header" />
+
+Unfortunately, the edit page leads us to a Google sign in page to [nyt.net](https://nyt.net/).
+
+In the settings page, we see a cute icon to turn on/off Shortz mode and some additional debug settings:
+
+- Force gold star eligibility (although this gives a gold star at the end screen, it isn't permanent)
+- Speed up sync interval
+- Autocheck notice already seen
+
+<Image src={cwImg2} alt="New crossword settings" />
+
+Finally, there are new 49.9%/74.9%/99.9% options in the "Reveal" tab. We can use these options to cheat by revealing all but the last cell - it doesn't even affect our gold star eligibility!
+
+<Image src={cwImg3} alt="New crossword reveal" />
+
+## Shortz mode in the Spelling Bee
+
+As noted in [this Reddit post](https://old.reddit.com/r/NYTSpellingBee/comments/iovlmy/), enabling Shortz mode allows you to cheat in the Spelling Bee by only typing in the center letter. It will submit new words for as many of the center letter as you typed.
+
+<video controls>
+  <source src={spellingbee} type="video/webm" />
+  Your browser does not support the video tag.
+</video>
+
+## Shortz mode in Connections
+
+The Shortz mode in Connections has a more stringent check - it also checks that the path name contains `/puzzles/shortz`. I don't know how to get to the puzzle with that path, but we can easily bypass the check by calling `window.history.replaceState({} , 'title', 'https://www.nytimes.com/puzzles/shortz');` before starting the game.
+
+In Connections, we now see a "Complete puzzle" button!
+
+<video controls>
+  <source src={connections} type="video/webm" />
+  Your browser does not support the video tag.
+</video>
+
+## Shortz mode in Strands
+
+The path name check from Connections is also implemented in Strands.
+
+There is now a "Complete" button, which completes the whole puzzle except for the spangram:
+
+<video controls>
+  <source src={strands} type="video/webm" />
+  Your browser does not support the video tag.
+</video>

@@ -8,7 +8,7 @@ interface Props {
 const { frontmatter } = Astro.props;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -26,10 +26,7 @@ const { frontmatter } = Astro.props;
       async
       defer
       data-domain="kevinniuwu.com"
-      src="https://data.kev3u.com/js/pa.js"
-    >
-
-    </script>
+      src="https://data.kev3u.com/js/pa.js"></script>
     <style is:global>
       .blog-link,
       .blogpost a {
@@ -98,7 +95,11 @@ const { frontmatter } = Astro.props;
         }
 
         img {
-          @apply mt-5 ml-auto mr-auto w-1/2 min-w-[300px];
+          @apply mt-5 ml-auto mr-auto w-3/4 min-w-[300px];
+        }
+
+        video {
+          @apply mt-5 ml-auto mr-auto min-w-[300px];
         }
 
         .astro-code {
@@ -116,7 +117,7 @@ const { frontmatter } = Astro.props;
     <article class="blogpost">
       {frontmatter?.date && <p class="-mb-7 font-mono">{frontmatter.date}</p>}
       {frontmatter?.title && <h1>{frontmatter.title}</h1>}
-      <slot></slot>
+      <slot />
     </article>
   </body>
 </html>
