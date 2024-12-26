@@ -9,19 +9,19 @@
     "preview": "astro preview"
   },
   "devDependencies": {
-    "@astrojs/image": "^0.10.0",
-    "@astrojs/tailwind": "^0.2.2",
-    "astro": "^1.0.0-rc.3",
-    "prettier": "^2.7.1",
-    "prettier-plugin-astro": "^0.1.1",
+    "@astrojs/tailwind": "5.1.4",
+    "astro": "5.1.1",
+    "prettier": "^3.4.2",
+    "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.1.11"
   },
   "dependencies": {
-    "@astrojs/mdx": "^0.11.5",
-    "@astrojs/sitemap": "^1.2.2",
-    "rehype-katex": "^6.0.2",
-    "remark-math": "^5.1.1",
+    "@astrojs/mdx": "4.0.3",
+    "@astrojs/sitemap": "3.2.1",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0",
     "remark-toc": "^8.0.1",
-    "sharp": "^0.31.1"
+    "sharp": "^0.31.1",
+    "unist-util-map": "^4.0.0"
   }
 }
