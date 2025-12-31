@@ -9,15 +9,15 @@
     "preview": "astro preview"
   },
   "devDependencies": {
-    "@astrojs/tailwind": "5.1.4",
-    "astro": "5.1.1",
+    "@astrojs/tailwind": "6.0.2",
+    "astro": "5.16.6",
     "prettier": "^3.4.2",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.1.11"
   },
   "dependencies": {
-    "@astrojs/mdx": "4.0.3",
-    "@astrojs/sitemap": "3.2.1",
+    "@astrojs/mdx": "4.3.13",
+    "@astrojs/sitemap": "3.6.0",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "remark-toc": "^8.0.1",
