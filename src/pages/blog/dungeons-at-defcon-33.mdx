@@ -1,0 +1,322 @@
+---
+title: "Winning Dungeons @ DEFCON 33"
+layout: ../../layouts/BlogLayout.astro
+date: "2025-12-31"
+---
+
+import { Image } from "astro:assets";
+import forestImg from "../../assets/dungeons-at-defcon-33/forest-text-adventure.png";
+import manorMapImg from "../../assets/dungeons-at-defcon-33/manor-map.png";
+import bikiniClueImg from "../../assets/dungeons-at-defcon-33/bikini-clue.png";
+import bikiniFlagImg from "../../assets/dungeons-at-defcon-33/bikini-flag.png";
+import painting1Img from "../../assets/dungeons-at-defcon-33/painting-1.png";
+import painting2Img from "../../assets/dungeons-at-defcon-33/painting-2.png";
+import mapRunesImg from "../../assets/dungeons-at-defcon-33/map-runes.png";
+import finalItemsImg from "../../assets/dungeons-at-defcon-33/final-items.png";
+import northwestRunesImg from "../../assets/dungeons-at-defcon-33/northwest-runes.png";
+import scoreboardImg from "../../assets/dungeons-at-defcon-33/scoreboard.png";
+import manorImg from "../../assets/dungeons-at-defcon-33/manor.png";
+import manorMapPuzzleImg from "../../assets/dungeons-at-defcon-33/manor-map-puzzle.png";
+import mapLettersImg from "../../assets/dungeons-at-defcon-33/map-letters.png";
+import puzzle4Img from "../../assets/dungeons-at-defcon-33/puzzle-4-sheet.jpg";
+import badgesImg from "../../assets/dungeons-at-defcon-33/badges.jpg";
+
+Ashley and I competed as the team "stargazers" in Dungeons @ DEFCON at DEF CON 33 and won a black badge
+(free entry to DEF CON for life) alongside some cool D&D-related swag!
+
+Huge thanks to the organizers, all the competitors, and everyone willing to help us during the con.
+
+## Table of Contents
+
+## Overview
+
+tl;dr: multi-day puzzle hunt in a text adventure and a top-down 2D game with in-person elements.
+
+- Phase 1 (Forest): browser text adventure + puzzles
+- Phase 2 (Manor): browser top-down game, physical puzzle sheets and items
+- Phase 3: In-person boss battle
+
+## Phase 1 - Forest
+
+The forest was a browser text adventure with N/S/E/W movement and small puzzles scattered throughout.
+Each grid space that the player entered would give a description of what was in that location, what was in the adjacent spaces, and which directions the player could go in next.
+The top 15 teams by points would advance to Day 2, and there was a live leaderboard on the website to track the standings.
+Points were earned as you solved mini-puzzles across the map, mostly consisting of simple ciphers resulting in a solution word or phrase.
+
+The interface was purely text-based, and part of the starting information was that automating the game wouldn't work.
+Although this didn't seem like a hard _rule_ by the wording, it discouraged us enough to do most of our data collection by hand.
+
+<Image src={forestImg} alt="Forest text adventure interface" />
+
+### Point puzzles (examples)
+
+There were mostly self-contained ciphers of various forms (text, with some picture elements).
+
+Here are three examples:
+
+- `RSFSHCPMZIWJSVIZIV`
+  - Solution: Caesar left shift by 4
+  - `NOBODYLIVESFOREVER`
+- `C3V4C11C16C4V2V2C3C16C6V2C16C14V2V2C15`
+  - Solution: Replace `C<n>` with the nth consonant and `V<n>` with the nth vowel
+  - `DONTFEEDTHETREES`
+- `BCAAAABCCCABCCABACACCBABABBACCCABCAABBBACCBBBABBBBB`
+  `ACCBBBABBBBBACCBBBABB`
+  - Solution: Group by 3. Map A=0 B=1 C=2 to ternary. Map the resulting numbers 0-25 to letters A-Z.
+  - `PARTYLIKEITSNINENINENINE`
+
+### Unsolved puzzles
+
+Here are some puzzles that we found during the competition but didn't get the solution for. Let me know if you solve these!
+
+- `ASORTSDHEHLIFG`
+- `MTPHWZEWFIJSTMOZZRVO`
+- `OFWGTIHWVSPHJW`
+
+### Story puzzles
+
+After wandering around the map for quite a while, we found the "lady in the lake" who provided this hint:
+
+---
+
+Of the three passes, the southernmost leads to the Manor. But you will need something shiny to enter the pass.
+
+If you see a green marker, go NORTH.
+
+If you see an orange marker, go SOUTH.
+
+If you see a blue marker, go EAST.
+
+If you see a yellow marker, go WEST.
+
+An answer lies in the stony lawns in the north.
+
+An answer lies in the trees to the south.
+
+---
+
+They could be found in various places across the map, and they would lead to an item needed to progress to the mountain area.
+However, we had already combed the map for hours and had stumbled across the item anyway.
+The "stony lawns" and "trees to the south" hint at the locations of the final puzzles for this area.
+
+In the mountain area, there were two gargoyles with puzzles:
+
+#### Gargoyle 1
+
+"A DRAGON speaks in stones. What does it say?"
+
+Solution:
+In the northern area of the map, there were a series of black and white stones at certain grid locations.
+Looking at just the black stones in Braille gave "DRAGON" and the white stones gave "TRSXAZ".
+The main trick of this puzzle was that the black and white stones overlapped on each other.
+
+Using the Vigenere cipher to combine those, we got the answer: "WISDOM"
+
+#### Gargoyle 2
+
+"What is gained when you see the forest for the trees?"
+
+Solution:
+On the south side of the map, there was a line of "odd trees" in the grass. It was obvious this was part of the puzzle, but they didn't
+seem to spell out a correct word. At this point, it was pretty late on Day 1 of DEFCON.
+As a final measure, we decided to actually build a scraper to explore the map.
+It didn't find anything that helpful, except it found the last "odd tree" that we happened to miss.
+
+The trees encoded Morse code: `GTTGTGTGTGGTGGTGTGTGTGGTGTGGTGTTGT`
+
+2 Ts = dash, 1 T = dot, G = space
+
+Answer: `BEHIR`
+
+---
+
+By defeating the gargoyles, we were allowed to enter the Manor, but we were instructed to finish earning all the points we wanted
+before continuing. We were pretty exhausted at this point so we called it a night and entered the Manor.
+By the next morning, only us and one other team - "mkbt" - had reached the Manor.
+
+## Phase 2 - Manor
+
+On Day 2, any teams under the top 15 in points were eliminated. All teams were moved to the Manor, but teams who made it there on their own were given a points bonus.
+
+The Manor was a 2D pixel RPG-style map. Clicking the wrong thing could lock you out temporarily.
+Interacting with objects in the Manor gave puzzles and gold coins, whose purpose was initially unknown.
+
+Playing the Manor looked like this. We could only see a 5x5 square around the player.
+
+<Image src={manorImg} alt="Manor gameplay" />
+
+### Manor Puzzles (5 total)
+
+There were five places on the map that would prompt the player to get a physical envelope from the contest booth. The envelopes had extra info for the puzzles and a link to a page to submit the answer.
+By answering the puzzles correctly, we got specific items that would be necessary for the boss battle.
+
+#### Puzzle 1
+
+Some of the walls were able to be walked through. Navigating an invisible maze in the corner of the map
+led us to a riddle:
+
+---
+
+> A map is hung on the wall, but it is all mixed up. A note underneath reads:
+>
+> I am neither evil nor good nor neutral, but I am aligned. Where I exist, even the planets feel my influence. Speak my name and the map will be revealed.
+
+<Image src={manorMapPuzzleImg} alt="Manor map puzzle image" />
+
+---
+
+The image depicts an eclipse, which occurs during a syzygy (alignment of celestial bodies).
+Inputting "SYZYGY" flashed the full map on the screen for a few seconds.
+
+<Image src={manorMapImg} alt="Manor 2D pixel map" />
+
+One of the puzzles referenced this map and provided a place to put in an answer. The runes in the top right corner were Ultima Online runes (surprisingly hard to recognize for two people who knew nothing about the game).
+
+<Image src={mapRunesImg} alt="Runes in the map corner" />
+
+Answer: `ANXENCORP`
+
+#### Puzzle 2
+
+These paintings could be found in the Manor:
+
+<Image src={painting1Img} alt="Painting used to identify ET IN ARCADIA EGO" />
+<Image src={painting2Img} alt="Second painting with ciphertext" />
+
+Reverse image search revealed "Et in Arcadia ego", which matches the partially
+filled text in the painting. We can use this in a Vigenere cipher:
+
+Key: `ETINARCADIAEGO`, ciphertext: `RNTYAZCMXBOTOO`
+
+Answer: `NULLAIAMUTOPIA`
+
+#### Puzzle 3
+
+<Image src={bikiniClueImg} alt="Painting clue used for the Bikini Atoll step" />
+
+<br />
+
+Top text is a YouTube video: `https://www.youtube.com/watch?v=UTduy7Qkvk8`
+
+Title of the video: **Do you have a flag?**
+
+Reverse image search led to Bikini Atoll.
+
+Use the Bikini Atoll flag as a Vigenere key for the bottom text (ciphertext)
+
+<Image src={bikiniFlagImg} alt="Flag of Bikini Atoll" />
+<br />
+Answer: `ONLYCOUNTSIFYOUHAVEAFLAG`
+
+#### Puzzle 4
+
+There were letters etched on the ground in the map.
+
+<Image src={mapLettersImg} alt="Locations of letters in the map" />
+
+We also found signs in the map with the following contents:
+
+| AA5 | AC5 |
+| --- | --: |
+| A   |   7 |
+| C   |  16 |
+| D   |  15 |
+| E   |  10 |
+| F   |  13 |
+| G   |   8 |
+| H   |  11 |
+| I   |   7 |
+| J   |  19 |
+| L   |  12 |
+| M   |  15 |
+| N   |  16 |
+| O   |  15 |
+| P   |  14 |
+| Q   |  12 |
+| R   |  11 |
+| S   |  13 |
+| T   |  12 |
+| U   |   8 |
+| V   |   0 |
+| Y   |  11 |
+| X   |   8 |
+
+And the physical sheet contained (ignore our scribblings):
+
+<Image src={puzzle4Img} alt="Puzzle 4 physical sheet" />
+
+The first three puzzles were not too hard once we got through exploring most of the Manor.
+However, we were stuck on this puzzle for hours. The puzzle organizers had announced partway through the day that the gold coins
+we had been collecting could be traded for hints. One coin for a small hint, three for a bigger hint, and five for (essentially) a full solve of a puzzle.
+There were a limited number of coins on the map - only around 5 or 6. We used a lot of our budget on this puzzle and still weren't able to solve it!
+
+Getting desperate, we asked if we could collaborate with other teams. We could see on the leaderboard that a few teams had solved 1 or 2 puzzles.
+We were told that we could collaborate, so we started looking around for anyone else who was doing Dungeons @ DEFCON.
+
+Not everyone was willing to collaborate, but most were. Unfortunately, we didn't find anyone who had solved this puzzle yet - most people hadn't solved any at all.
+But most people _had_ found at least a few gold coins. With an impressive _three_ solves under our belts, we had a lot of bargaining power.
+Knowing the price of a puzzle answer, we vastly undercut the contest organizers by offering a full puzzle solution for _only one coin_!
+
+Finally, after many hints, we were able to get the answer by interpreting the list as coordinates and using the circled letters/numbers. The answer was already
+on our spreadsheet for most of the time... but we had really started to overthink it.
+
+Answer: `REANIMATION`
+
+(Actually the sheet has one fewer letter circled than numbers. This answer only works if the letter "L" was circled.
+I wonder if that was a mistake?)
+
+#### Puzzle 5
+
+The top right of the map had a series of objects/furniture that each had a different rune associated with it.
+The runes were in a variety of languages, from Pokemon Unown, to Gravity Falls, to Elder Futhark!
+Reverse image searching helped but had its limits. Scrolling through dcode.fr and omniglot.com helped us find many,
+but we were still stuck on some of the languages. Turns out the real treasure was the friends we made along the way,
+because a kind stranger at the con helped us find many that we simply couldn't find online despite our best efforts.
+
+<Image
+  src={northwestRunesImg}
+  alt="Google Sheet of translated runes and items"
+/>
+
+As the booths were closing down on Day 2, we used our last four coins to get a hint on this puzzle. (It seems the organizers didn't notice
+that we had used many more coins than were available on the map!) We asked if we needed to translate every single rune, and were told that no, we did not.
+
+The key to solving this puzzle was noticing that each runic language appeared once/twice/thrice/... This was also true for object types in the room.
+
+Assuming we must use each language once and each object type once, we logically deduced which
+letter was the one to use through the process of elimination.
+
+For example, since there is only one piano with a gothic rune, we know other letters cannot be from the gothic runes.
+
+There are two grandfather clocks, with one gothic rune and one Elder Futhark rune, so we choose the Elder Futhark rune.
+
+Answer: `NOWESCAPE`
+
+## Phase 3 - Boss battle
+
+We solved the final puzzle first, with "mkbt" solving closely after us.
+Since the village had already closed for Day 2, we had the first shot at the boss battle
+on Day 3.
+
+Since many elements of this challenge reminded us of puzzle hunts, we thought there would be a meta-puzzle combining all of the
+previous answers, or even actual D&D combat. We made a list of all the puzzle details.
+As it was clear the story was based on the D&D module
+[Curse of Strahd](https://en.wikipedia.org/wiki/Curse_of_Strahd), we also read up on Strahd's weaknesses as well.
+
+For each puzzle, we had received a physical item as a reward. The items were: two halves of a disc, a vial of holy water, a key, a letter, and a pack of dice.
+On the morning of Day 3 with the organizers, we found out we had to choose one person to go into the boss
+battle alone. We went with Ashley as I'd never played D&D before!
+
+We were far overprepared, as the final battle just involved remembering instructions to defeat
+the vampire, which were described in the letter we got as a puzzle reward. Luckily, we had studied it closely - we had to assemble the two halves of the disc before entering the room,
+unlock the door with the key, and pour holy water on the sigil.
+
+(We half expected it to come down to a dice roll, perhaps with modifiers depending on how many puzzles you had solved - but perhaps the stakes of a black badge are too high to lose to a nat 1!)
+
+<Image src={finalItemsImg} alt="Final winning screen" />
+
+<Image src={scoreboardImg} alt="Final scoreboard" />
+
+And the coveted black badge (normal badge left, black badge right):
+
+<Image src={badgesImg} alt="DEF CON 33 badges" />
