@@ -1,4 +1,6 @@
 ---
+import "../styles/fonts.css";
+
 interface Props {
   frontmatter: {
     title: string;
@@ -16,6 +18,20 @@ const { frontmatter } = Astro.props;
     <meta name="author" content="Kevin Wu" />
     <meta name="viewport" content="width=device-width" />
     <title>{frontmatter?.title || "Kevin Wu's Blog"}</title>
+    <link
+      rel="preload"
+      href="/fonts/inter/InterVariable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/inter/InterVariable-Italic.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"
