@@ -1,5 +1,5 @@
 import { defineConfig } from "astro/config";
-import tailwind from "@astrojs/tailwind";
+import { unified } from "@astrojs/markdown-remark";
 import mdx from "@astrojs/mdx";
 import remarkToc from "remark-toc";
 import remarkMath from "remark-math";
@@ -9,11 +9,13 @@ import sitemap from "@astrojs/sitemap";
 // https://astro.build/config
 export default defineConfig({
   site: "https://kevinniuwu.com",
+  compressHTML: true,
   integrations: [
-    tailwind(),
     mdx({
-      remarkPlugins: [remarkToc, remarkMath],
-      rehypePlugins: [rehypeKatex],
+      processor: unified({
+        remarkPlugins: [remarkToc, remarkMath],
+        rehypePlugins: [rehypeKatex],
+      }),
     }),
     sitemap({
       filter: (page) =>

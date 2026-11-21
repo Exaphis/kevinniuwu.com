@@ -2,6 +2,9 @@
   "name": "@example/minimal",
   "version": "0.0.1",
   "private": true,
+  "engines": {
+    "node": ">=22.23.4"
+  },
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -9,19 +12,23 @@
     "preview": "astro preview"
   },
   "devDependencies": {
-    "@astrojs/tailwind": "6.0.2",
-    "astro": "5.16.6",
-    "prettier": "^3.4.2",
-    "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.1.11"
+    "astro": "7.4.13",
+    "autoprefixer": "10.7.0",
+    "postcss-import": "17.0.1",
+    "prettier": "^3.10.1",
+    "prettier-plugin-astro": "^1.1.2",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "tailwindcss": "^3.4.19"
   },
   "dependencies": {
-    "@astrojs/mdx": "4.3.13",
-    "@astrojs/sitemap": "3.6.0",
+    "@astrojs/markdown-remark": "7.3.10",
+    "@astrojs/mdx": "8.1.6",
+    "@astrojs/sitemap": "3.7.6",
+    "katex": "0.19.1",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
-    "remark-toc": "^8.0.1",
-    "sharp": "0.34.5",
+    "remark-toc": "^9.0.0",
+    "sharp": "0.35.5",
     "unist-util-map": "^4.0.0"
   }
 }
