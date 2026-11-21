@@ -6,11 +6,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        accent: "#D9A629",
-        background: "#08122B",
-        link: "#A9E2EE",
-        linkRead: "#A498EC",
-        text: "#EEEEEE",
+        accent: "#dbb365",
+        background: "#0b162c",
+        link: "#a5d4de",
+        linkRead: "#b0a4d8",
+        text: "#e8eaf0",
       },
       spacing: {
         112: "28rem",
@@ -57,7 +57,7 @@ module.exports = {
       },
     },
     fontFamily: {
-      sans: ["Inter", ...defaultTheme.fontFamily.sans],
+      sans: defaultTheme.fontFamily.sans,
       mono: ["Source Code Pro", ...defaultTheme.fontFamily.mono],
     },
   },

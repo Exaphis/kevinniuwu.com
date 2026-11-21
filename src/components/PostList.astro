@@ -1,0 +1,17 @@
+---
+import type { BlogPost } from "../data/posts";
+import { formatDate, normalizeDate } from "../data/dates";
+interface Props {
+  posts: BlogPost[];
+}
+const { posts } = Astro.props;
+---
+
+<ul class="post-list">
+  {posts.map(({ url, frontmatter: { title, date } }) => (
+    <li>
+      <a href={url}>{title}</a>
+      <time datetime={normalizeDate(date)}>{formatDate(date)}</time>
+    </li>
+  ))}
+</ul>

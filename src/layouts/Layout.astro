@@ -1,34 +1,33 @@
 ---
 import "../styles/tailwind.css";
 import "../styles/fonts.css";
+import "../styles/site.css";
 
 export interface Props {
   title: string;
-  bodyClass: string;
+  bodyClass?: string;
+  description?: string;
 }
 
-const { title, bodyClass } = Astro.props as Props;
+const {
+  title,
+  bodyClass,
+  description = "Kevin Wu’s personal site.",
+} = Astro.props as Props;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Kevin Wu's personal site." />
+    <meta name="description" content={description} />
     <meta name="author" content="Kevin Wu" />
     <meta name="viewport" content="width=device-width" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <title>{title}</title>
     <link
       rel="preload"
-      href="/fonts/inter/InterVariable.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/inter/InterVariable-Italic.woff2"
+      href="/fonts/newsreader/newsreader-latin-normal-400.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -38,9 +37,7 @@ const { title, bodyClass } = Astro.props as Props;
       defer
       data-domain="kevinniuwu.com"
       src="https://data.kev3u.com/js/pa.js"
-    >
-
-    </script>
+    ></script>
 
     <slot name="head" />
   </head>

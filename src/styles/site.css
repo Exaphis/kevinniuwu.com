@@ -1,0 +1,492 @@
+:root {
+  color-scheme: dark;
+  --surface: #0b162c;
+  --ink: #e8eaf0;
+  --secondary: #a9b3c4;
+  --accent: #a5d4de;
+  --gold: #dbb365;
+  --line: #28344a;
+  --code: #101e36;
+}
+html {
+  background: var(--surface);
+}
+body {
+  margin: 0;
+  font-size-adjust: none;
+  background: var(--surface);
+  color: var(--ink);
+  font:
+    16px/1.65 system-ui,
+    sans-serif;
+}
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+a:visited {
+  color: #b0a4d8;
+}
+:where(a, button, pre, .katex-display):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 5px;
+}
+h1,
+h2,
+h3,
+h4 {
+  color: var(--gold);
+  font-family: "Newsreader", Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+}
+h1 {
+  font-size: clamp(42px, 5.5vw, 58px);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  margin: 0 0 23px;
+}
+h2 {
+  font-size: 25px;
+  line-height: 1.3;
+  margin: 0 0 22px;
+}
+p {
+  margin: 0;
+}
+button {
+  font: inherit;
+  color: inherit;
+}
+time {
+  color: var(--secondary);
+  font-size: 12px;
+}
+.home {
+  max-width: 1120px;
+  margin: auto;
+  padding-bottom: 26px;
+}
+.hero {
+  position: relative;
+  isolation: isolate;
+  padding: 62px 30px 44px;
+}
+.home-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 130px;
+  gap: 40px;
+  align-items: center;
+  max-width: 730px;
+  margin: auto;
+}
+.greeting {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--secondary);
+  font:
+    16px/1.5 system-ui,
+    sans-serif;
+  letter-spacing: normal;
+}
+.intro {
+  font-size: 21px;
+  margin: 0 0 16px;
+}
+.bio {
+  max-width: 46ch;
+}
+.portrait {
+  display: block;
+  width: 116px;
+  height: 136px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.contact-links {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 14px;
+}
+.technical-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.3;
+}
+.animation-toggle {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gold);
+  opacity: 0.35;
+  transition:
+    opacity 0.15s,
+    background-color 0.15s,
+    border-color 0.15s;
+  cursor: pointer;
+}
+.animation-toggle[hidden] {
+  display: none;
+}
+.animation-toggle:hover,
+.animation-toggle:focus-visible {
+  opacity: 1;
+  background: var(--surface);
+  border-color: var(--line);
+}
+.animation-toggle span {
+  width: 9px;
+  height: 12px;
+  border-left: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+}
+.animation-toggle[aria-pressed="true"] span {
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-right: 0;
+  border-left: 8px solid currentColor;
+}
+.home-section {
+  max-width: 790px;
+  margin: 0 auto;
+  padding: 35px 30px;
+  border-top: 1px solid var(--line);
+}
+.post-list,
+.project-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.post-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 100px;
+  gap: 24px;
+  padding: 12px 0;
+}
+.post-list time {
+  text-align: right;
+}
+.more {
+  display: inline-block;
+  margin-top: 24px;
+  font-size: 13px;
+}
+.project-row {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 26px;
+  padding: 19px 0;
+  border-bottom: 1px solid var(--line);
+}
+.project-row:first-child {
+  padding-top: 0;
+}
+.project-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.project-row p {
+  font-size: 14px;
+}
+.project-row small {
+  display: block;
+  margin-top: 5px;
+  color: var(--secondary);
+  font:
+    11px/1.6 ui-monospace,
+    monospace;
+}
+.project-detail {
+  min-width: 0;
+}
+.project-shot {
+  display: block;
+  max-width: 440px;
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.project-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.project-shot--windows {
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+.reading-page {
+  max-width: calc(64ch + 60px);
+  margin: auto;
+  padding: 45px 30px 60px;
+}
+.back-link {
+  display: inline-block;
+  margin-bottom: 28px;
+  font-size: 13px;
+}
+.archive {
+  max-width: calc(66ch + 60px);
+}
+.archive-year h2 {
+  color: var(--secondary);
+  font:
+    14px/1.5 ui-monospace,
+    monospace;
+  margin: 35px 0 22px;
+}
+.article-header h1 {
+  overflow-wrap: anywhere;
+  font-size: clamp(32px, 4.6vw, 44px);
+  margin: 0 0 23px;
+}
+.article-header time {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 32px;
+}
+.prose {
+  font:
+    19px/1.75 "Newsreader",
+    Georgia,
+    serif;
+  overflow-wrap: anywhere;
+}
+.prose p {
+  margin: 20px 0;
+}
+.prose :is(h1, h2, h3, h4) {
+  margin: 30px 0 20px;
+  line-height: 1.3;
+}
+.prose h1 {
+  font-size: 30px;
+}
+.prose h2 {
+  font-size: 25px;
+}
+.prose h3 {
+  font-size: 22px;
+}
+.prose h4 {
+  font-size: 20px;
+}
+.prose :is(ul, ol) {
+  padding-left: 1.4em;
+  margin: 20px 0;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose li {
+  margin-block: 6px;
+}
+.prose li > p {
+  margin-block: 8px;
+}
+.prose hr {
+  margin: 32px 0;
+  border-color: var(--line);
+}
+.prose blockquote {
+  margin: 24px 0;
+  padding-left: 20px;
+  border-left: 2px solid var(--line);
+  color: var(--secondary);
+}
+.prose code {
+  font:
+    14px/1.65 ui-monospace,
+    monospace;
+}
+.prose :not(pre) > code {
+  background: var(--code);
+  border-radius: 3px;
+  padding: 2px 4px;
+}
+.prose pre {
+  max-width: 100%;
+  margin: 24px 0;
+  padding: 18px;
+  overflow-x: auto;
+  overflow-wrap: normal;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--code) !important;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.prose pre code {
+  display: block;
+  min-width: max-content;
+  padding: 0;
+  background: transparent;
+}
+.codeblock {
+  max-width: 100%;
+  margin: 24px 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--code);
+}
+.codehead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 39px;
+  padding: 4px 15px;
+  border-bottom: 1px solid var(--line);
+  color: var(--secondary);
+  font:
+    11px/1.5 ui-monospace,
+    monospace;
+}
+.codehead button {
+  min-height: 30px;
+  background: transparent;
+  border: 0;
+  padding: 2px 0;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.codeblock pre {
+  margin: 0;
+  border: 0;
+}
+.prose :is(img, video) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 24px auto;
+  border-radius: 3px;
+}
+.prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 24px 0;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+.prose :is(th, td) {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.prose .katex {
+  font-size: 1.1em;
+}
+.prose .katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.25em;
+}
+@media (max-width: 600px) {
+  .hero {
+    padding: 30px 22px 44px;
+  }
+  .home-intro {
+    grid-template-columns: minmax(0, 1fr) 70px;
+    gap: 16px;
+    align-items: start;
+  }
+  .intro-copy {
+    display: contents;
+  }
+  .home-intro h1 {
+    grid-column: 1;
+    grid-row: 1;
+    margin-bottom: 0;
+  }
+  .home-intro .portrait {
+    grid-column: 2;
+    grid-row: 1;
+    width: 70px;
+    height: 82px;
+  }
+  .home-intro :is(.intro, .bio, .contact-links) {
+    grid-column: 1 / -1;
+  }
+  .animation-toggle {
+    top: auto;
+    bottom: 0;
+    right: 14px;
+  }
+  .home-section {
+    margin-inline: 22px;
+    padding: 28px 0;
+  }
+  .project-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 17px 0;
+  }
+  .post-list li {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    padding: 13px 0;
+  }
+  .post-list time {
+    text-align: left;
+  }
+  .reading-page {
+    padding: 30px 22px 50px;
+  }
+}
+@media (hover: none) {
+  .animation-toggle {
+    width: 44px;
+    height: 44px;
+    opacity: 0.55;
+  }
+  .codehead button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animation-toggle {
+    transition: none;
+  }
+}
+@media (max-width: 560px) {
+  .intro {
+    font-size: 19px;
+    margin-bottom: 0;
+  }
+  .contact-links {
+    margin-top: 5px;
+    gap: 18px;
+  }
+  .portrait {
+    margin-top: 5px;
+  }
+  .prose {
+    font-size: 18px;
+  }
+}
