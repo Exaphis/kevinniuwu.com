@@ -8,58 +8,6 @@ import KevinImg from "../images/kevin.jpg";
 import NYTogetherImg from "../assets/projects/nytogether.webp";
 import ScratchpadImg from "../assets/projects/scratchpad.webp";
 import TinkerImg from "../assets/projects/tinker.webp";
-
-const projects = [
-  {
-    name: "μTube",
-    href: "https://github.com/Exaphis/mutube",
-    description:
-      "μTube uses reverse engineering and binary patching to inject TizenTube Cobalt's userscript into the Apple TV YouTube app, adding ad removal and SponsorBlock support.",
-  },
-  {
-    name: "NYTogether",
-    href: "https://github.com/Exaphis/nytogether",
-    description:
-      "NYTogether is a Chrome extension that modifies the New York Times official crossword website to support multiplayer crossword games. The extension hooks into the website's Redux store to get the current game state and sync it with other players.",
-    image: NYTogetherImg,
-    alt: "Two NYTogether crossword sessions with synchronized cells and a shared room.",
-    windows: true,
-  },
-  {
-    name: "Scratchpad",
-    href: "https://scratchpad.kev3u.com",
-    description:
-      "Scratchpad lets you jot down notes in your browser, inspired by the simple contenteditable bookmarklet. Notes are automatically saved for later, and you can share your notes with others and collaborate in real-time.",
-    image: ScratchpadImg,
-    alt: "Scratchpad editor showing example website notes and its sharing and download controls.",
-  },
-  {
-    name: "Tinker",
-    href: "https://github.com/Exaphis/Tinker",
-    description:
-      "Tinker combines an ESP8266, a Waveshare 7.5-inch e-ink display, and a Rust backend to create a dashboard for time, weather, and bus arrival information.",
-    image: TinkerImg,
-    alt: "Tinker’s framed e-ink display showing bus arrival times, the clock, and a weather forecast.",
-  },
-  {
-    name: "Python JPEG decoder",
-    href: "https://github.com/Exaphis/python-jpeg-decoder",
-    description:
-      "A simple educational JPEG decoder written without external modules.",
-  },
-  {
-    name: "HackQ-Trivia",
-    href: "https://github.com/Exaphis/HackQ-Trivia",
-    description:
-      "HackQ-Trivia is a Python HQ Trivia bot. It receives HQ Trivia questions through their WebSocket connection and answers the questions automatically using web searches and natural language processing.",
-  },
-  {
-    name: "Tsunami",
-    href: "https://github.com/Exaphis/Tsunami",
-    description:
-      "Tsunami is a covert Windows driver that can read from and write to the memory of any process. It was used to create a proof-of-concept Overwatch aimbot and wallhack.",
-  },
-];
 ---
 
 <Layout title="Kevin Wu">
@@ -113,42 +61,184 @@ const projects = [
     <section class="home-section" aria-labelledby="projects-heading">
       <h2 id="projects-heading">Projects</h2>
       <ul class="project-list">
-        {projects.map((project) => (
-          <li
-            class:list={[
-              "project-row",
-              { "project-row--illustrated": project.image },
-            ]}
-          >
-            <div class="project-copy">
-              <h3 class="project-title">
-                <a href={project.href} target="_blank" rel="noopener">
-                  {project.name} ↗
-                </a>
-              </h3>
-              <p>{project.description}</p>
-            </div>
-            {project.image && (
+        <li class="project-row">
+          <div class="project-copy">
+            <h3 class="project-title">
               <a
-                class:list={[
-                  "project-shot",
-                  { "project-shot--windows": project.windows },
-                ]}
-                href={project.href}
+                href="https://github.com/Exaphis/mutube"
                 target="_blank"
                 rel="noopener"
               >
-                <Image
-                  src={project.image}
-                  alt={project.alt}
-                  widths={[480, 960]}
-                  sizes="(max-width: 600px) calc(100vw - 44px), 260px"
-                  loading="lazy"
-                />
+                μTube ↗
               </a>
-            )}
-          </li>
-        ))}
+            </h3>
+            <p>
+              μTube uses reverse engineering and binary patching to inject{" "}
+              <a
+                href="https://github.com/reisxd/TizenTubeCobalt"
+                target="_blank"
+                rel="noopener"
+              >
+                TizenTube Cobalt
+              </a>
+              {
+                "'s userscript into the Apple TV YouTube app, adding ad removal and SponsorBlock support."
+              }
+            </p>
+          </div>
+        </li>
+        <li class="project-row project-row--illustrated">
+          <div class="project-copy">
+            <h3 class="project-title">
+              <a
+                href="https://github.com/Exaphis/nytogether"
+                target="_blank"
+                rel="noopener"
+              >
+                NYTogether ↗
+              </a>
+            </h3>
+            <p>
+              NYTogether is a Chrome extension that modifies the New York Times
+              official crossword website to support multiplayer crossword games.
+              The extension hooks into the website's Redux store to get the
+              current game state and sync it with other players.
+            </p>
+          </div>
+          <a
+            class="project-shot project-shot--windows"
+            href="https://github.com/Exaphis/nytogether"
+            target="_blank"
+            rel="noopener"
+          >
+            <Image
+              src={NYTogetherImg}
+              alt="Two NYTogether crossword sessions with synchronized cells and a shared room."
+              widths={[480, 960]}
+              sizes="(max-width: 600px) calc(100vw - 44px), 260px"
+              loading="lazy"
+            />
+          </a>
+        </li>
+        <li class="project-row project-row--illustrated">
+          <div class="project-copy">
+            <h3 class="project-title">
+              <a
+                href="https://scratchpad.kev3u.com"
+                target="_blank"
+                rel="noopener"
+              >
+                Scratchpad ↗
+              </a>
+            </h3>
+            <p>
+              Scratchpad lets you jot down notes in your browser, inspired by
+              the simple contenteditable bookmarklet. Notes are automatically
+              saved for later, and you can share your notes with others and
+              collaborate in real-time.
+            </p>
+          </div>
+          <a
+            class="project-shot"
+            href="https://scratchpad.kev3u.com"
+            target="_blank"
+            rel="noopener"
+          >
+            <Image
+              src={ScratchpadImg}
+              alt="Scratchpad editor showing example website notes and its sharing and download controls."
+              widths={[480, 960]}
+              sizes="(max-width: 600px) calc(100vw - 44px), 260px"
+              loading="lazy"
+            />
+          </a>
+        </li>
+        <li class="project-row project-row--illustrated">
+          <div class="project-copy">
+            <h3 class="project-title">
+              <a
+                href="https://github.com/Exaphis/Tinker"
+                target="_blank"
+                rel="noopener"
+              >
+                Tinker ↗
+              </a>
+            </h3>
+            <p>
+              Tinker combines an ESP8266, a Waveshare 7.5-inch e-ink display,
+              and a Rust backend to create a dashboard for time, weather, and
+              bus arrival information.
+            </p>
+          </div>
+          <a
+            class="project-shot"
+            href="https://github.com/Exaphis/Tinker"
+            target="_blank"
+            rel="noopener"
+          >
+            <Image
+              src={TinkerImg}
+              alt="Tinker’s framed e-ink display showing bus arrival times, the clock, and a weather forecast."
+              widths={[480, 960]}
+              sizes="(max-width: 600px) calc(100vw - 44px), 260px"
+              loading="lazy"
+            />
+          </a>
+        </li>
+        <li class="project-row">
+          <div class="project-copy">
+            <h3 class="project-title">
+              <a
+                href="https://github.com/Exaphis/python-jpeg-decoder"
+                target="_blank"
+                rel="noopener"
+              >
+                Python JPEG decoder ↗
+              </a>
+            </h3>
+            <p>
+              A simple educational JPEG decoder written in Python without
+              external modules.
+            </p>
+          </div>
+        </li>
+        <li class="project-row">
+          <div class="project-copy">
+            <h3 class="project-title">
+              <a
+                href="https://github.com/Exaphis/HackQ-Trivia"
+                target="_blank"
+                rel="noopener"
+              >
+                HackQ-Trivia ↗
+              </a>
+            </h3>
+            <p>
+              HackQ-Trivia is a Python HQ Trivia bot. It receives HQ Trivia
+              questions through their WebSocket connection and answers the
+              questions automatically using web searches and natural language
+              processing.
+            </p>
+          </div>
+        </li>
+        <li class="project-row">
+          <div class="project-copy">
+            <h3 class="project-title">
+              <a
+                href="https://github.com/Exaphis/Tsunami"
+                target="_blank"
+                rel="noopener"
+              >
+                Tsunami ↗
+              </a>
+            </h3>
+            <p>
+              Tsunami is a covert Windows driver that can read from and write to
+              the memory of any process. It was used to create a
+              proof-of-concept Overwatch aimbot and wallhack.
+            </p>
+          </div>
+        </li>
       </ul>
     </section>
   </main>
