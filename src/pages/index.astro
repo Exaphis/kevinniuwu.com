@@ -7,12 +7,18 @@ import { posts } from "../data/posts";
 import KevinImg from "../images/kevin.jpg";
 import NYTogetherImg from "../assets/projects/nytogether.webp";
 import ScratchpadImg from "../assets/projects/scratchpad.webp";
+import TinkerImg from "../assets/projects/tinker.webp";
 
 const projects = [
   {
+    name: "μTube",
+    href: "https://github.com/Exaphis/mutube",
+    description:
+      "μTube uses reverse engineering and binary patching to inject TizenTube Cobalt's userscript into the Apple TV YouTube app, adding ad removal and SponsorBlock support.",
+  },
+  {
     name: "NYTogether",
     href: "https://github.com/Exaphis/nytogether",
-    tech: "TypeScript · WXT",
     description:
       "NYTogether is a Chrome extension that modifies the New York Times official crossword website to support multiplayer crossword games. The extension hooks into the website's Redux store to get the current game state and sync it with other players.",
     image: NYTogetherImg,
@@ -22,30 +28,34 @@ const projects = [
   {
     name: "Scratchpad",
     href: "https://scratchpad.kev3u.com",
-    tech: "Svelte · Yjs",
     description:
       "Scratchpad lets you jot down notes in your browser, inspired by the simple contenteditable bookmarklet. Notes are automatically saved for later, and you can share your notes with others and collaborate in real-time.",
     image: ScratchpadImg,
     alt: "Scratchpad editor showing example website notes and its sharing and download controls.",
   },
   {
+    name: "Tinker",
+    href: "https://github.com/Exaphis/Tinker",
+    description:
+      "Tinker combines an ESP8266, a Waveshare 7.5-inch e-ink display, and a Rust backend to create a dashboard for time, weather, and bus arrival information.",
+    image: TinkerImg,
+    alt: "Tinker’s framed e-ink display showing bus arrival times, the clock, and a weather forecast.",
+  },
+  {
     name: "Python JPEG decoder",
     href: "https://github.com/Exaphis/python-jpeg-decoder",
-    tech: "Python",
     description:
       "A simple educational JPEG decoder written without external modules.",
   },
   {
     name: "HackQ-Trivia",
     href: "https://github.com/Exaphis/HackQ-Trivia",
-    tech: "Python",
     description:
       "HackQ-Trivia is a Python HQ Trivia bot. It receives HQ Trivia questions through their WebSocket connection and answers the questions automatically using web searches and natural language processing.",
   },
   {
     name: "Tsunami",
     href: "https://github.com/Exaphis/Tsunami",
-    tech: "C · C++ · Windows Driver Kit",
     description:
       "Tsunami is a covert Windows driver that can read from and write to the memory of any process. It was used to create a proof-of-concept Overwatch aimbot and wallhack.",
   },
@@ -104,35 +114,39 @@ const projects = [
       <h2 id="projects-heading">Projects</h2>
       <ul class="project-list">
         {projects.map((project) => (
-          <li class="project-row">
-            <div>
-              <a href={project.href} target="_blank" rel="noopener">
-                {project.name} ↗
-              </a>
-              <small>{project.tech}</small>
-            </div>
-            <div class="project-detail">
-              <p>{project.description}</p>
-              {project.image && (
-                <a
-                  class:list={[
-                    "project-shot",
-                    { "project-shot--windows": project.windows },
-                  ]}
-                  href={project.href}
-                  target="_blank"
-                  rel="noopener"
-                >
-                  <Image
-                    src={project.image}
-                    alt={project.alt}
-                    widths={[480, 960]}
-                    sizes="(max-width: 600px) calc(100vw - 44px), 440px"
-                    loading="lazy"
-                  />
+          <li
+            class:list={[
+              "project-row",
+              { "project-row--illustrated": project.image },
+            ]}
+          >
+            <div class="project-copy">
+              <h3 class="project-title">
+                <a href={project.href} target="_blank" rel="noopener">
+                  {project.name} ↗
                 </a>
-              )}
+              </h3>
+              <p>{project.description}</p>
             </div>
+            {project.image && (
+              <a
+                class:list={[
+                  "project-shot",
+                  { "project-shot--windows": project.windows },
+                ]}
+                href={project.href}
+                target="_blank"
+                rel="noopener"
+              >
+                <Image
+                  src={project.image}
+                  alt={project.alt}
+                  widths={[480, 960]}
+                  sizes="(max-width: 600px) calc(100vw - 44px), 260px"
+                  loading="lazy"
+                />
+              </a>
+            )}
           </li>
         ))}
       </ul>
